@@ -1,0 +1,25 @@
+# Local-only files (agent notes, analysis docs, scratch work)
+local/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# LaTeX build artefacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

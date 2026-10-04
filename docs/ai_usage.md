@@ -1,0 +1,3 @@
+- algorithm information generated
+- trace was generated to see data storage over time to test main.py
+- pretty print statements in evaluate.py

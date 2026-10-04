@@ -1,0 +1,108 @@
+﻿\documentclass[10pt,a4paper]{article}
+
+% ---------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------
+\usepackage[margin=1.9cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+% Compact section headings
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.0ex plus .3ex}{0.5ex}
+
+% Compact lists
+\setlist{nosep, leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.4em}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ---------------------------------------------------------------
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Automated Construction and Analysis of Decision Trees\\[0.2em]
+  for Comparison-Based Algorithms}\\[0.6em]
+  {\normalsize Project Outline}\\[0.3em]
+  {\small Clancy DeSilva \quad\textbullet\quad 123436262 \quad\textbullet\quad
+  Supervisor: Michel Schellekens \quad\textbullet\quad \today}
+\end{center}
+\vspace{-0.5em}
+\noindent\rule{\textwidth}{0.4pt}
+
+% ---------------------------------------------------------------
+\section{High Level Project Analysis}
+
+\textbf{What the project is about.}
+When a sorting algorithm runs, every decision it makes comes from comparing two elements
+and asking "is this one smaller than the other". If we record the answers to these
+questions for every possible input of a given size (n), the results form a binary tree, called
+a \emph{decision tree}. Each branching point is a comparison, each branch is a yes/no
+answer, and each leaf is a place where the algorithm finishes. The aim of this project is
+to build an online tool that generates these trees automatically, displays them clearly,
+and uses them to analyse how efficient different algorithms are.
+\\
+\\
+\textbf{Why it is useful.}
+Decision trees show exactly how much work an algorithm does. The longest path in the tree
+is the worst case, and the average path length is the average case. Theory gives a minimum number of comparisons any algorithm must make, so the tool can
+measure how close each algorithm comes to that limit. Drawing these trees by hand is only
+realistic for very small inputs, which is why an automated tool is valuable.
+\\
+\\
+\textbf{How it works.}
+Each algorithm runs on a special list that records every comparison and swap it makes.
+The algorithm is run on every possible ordering of the input, and runs that give the same
+answers to the same questions are grouped together, building the tree one path at a time.
+At each leaf, the recorded swaps are replayed to check that the algorithm really produced
+the correct result, whether that is a sorted list, a valid heap, or a partly sorted list.
+\\
+\\
+\textbf{Main challenge.}
+Trees grow very quickly: a list of 5 elements already has 120 possible orderings, making
+the full tree hard to read. To handle this, the tool will support \emph{partial sorting}
+algorithms, which produce smaller trees, and an interactive view where large parts of the
+tree are collapsed into a summary (for example, "these elements now form a heap") that
+the user can click on to expand further.
+\\
+\\
+\textbf{Progress so far.}
+The recording list, eight standard sorting algorithms and the core tree-building code are
+complete, and produce the correct tree for small inputs.
+\\
+\\
+\section{The Theory}
+\textbf{Yao's principle.}
+ It states that the best performance of a randomized algorithm on a worst-case input equals the best performance of a deterministic algorithm on a hard random input distribution. \\\\
+ By Yao's principle, the minimum average depth of a deterministic decision tree under uniformly random inputs also bounds the expected cost of any randomised algorithm on its worst input, so the bounds computed by the tool apply to randomised algorithms as well.
+\\
+\\
+% ---------------------------------------------------------------
+\section{Plan}
+\begin{enumerate}
+  \item \textbf{Foundation} \textit{(complete)} -- recording list, basic sorting
+        algorithms and tree builder.
+  \item \textbf{Choose a visualisation technology} \textit{(in progress)}-- try several options (such as
+        Graphviz, D3.js and Cytoscape.js) on small trees and pick the one that is
+        interactive, clear and works well online.
+  \item \textbf{Build the visualiser} -- labelled trees, the ability to view a chosen
+        subtree, and collapsible summary nodes for large trees.
+  \item \textbf{More complex algorithms} -- heapify (building a heap from an unordered
+        list) and partial sorting algorithms.
+  \item \textbf{Specialised algorithms} -- algorithms suggested by my supervisor,
+        including different cases of merging two heaps.
+  \item \textbf{Analysis} -- compare each algorithm's average number of comparisons with
+        the theoretical minimum, using random samples for larger inputs.
+  \item \textbf{Evaluation and report} -- test the tool, assess the results and write up
+        the project.
+\end{enumerate}
+
+\end{document}
