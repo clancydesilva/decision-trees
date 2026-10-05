@@ -1,24 +1,30 @@
 from tracked_list import TrackedList
 from algorithms import (
-    bubble_sort,
-    selection_sort,
-    insertion_sort,
-    cocktail_shaker_sort,
-    shell_sort,
-    quick_sort_lomuto,
-    quick_sort_hoare,
-    heap_sort,
-    merge_sort,
+    bubbleSort,
+    selectionSort,
+    insertionSort,
+    cocktailShakerSort,
+    shellSort,
+    quickSortLomuto,
+    quickSortHoare,
+    heapSort,
+    mergeSort,
     ALL_ALGORITHMS,
 )
-from evaluate import evaluate, evaluate_all, print_evaluation, print_comparison_table, run_scenarios
+from evaluate import (
+    evaluate,
+    evaluateAll,
+    printEvaluation,
+    printComparisonTable,
+    runScenarios,
+)
 
 
-# --- 1. Single algorithm evaluation with detailed output ---
-def test_single_evaluate():
-    print("\n>>> test_single_evaluate: bubble_sort on [5, 3, 1, 4, 2]")
-    result = evaluate(bubble_sort, [5, 3, 1, 4, 2])
-    print_evaluation(result)
+def testSingleEvaluate():
+    # Evaluate bubbleSort on a small input and check all output invariants
+    print("\n>>> testSingleEvaluate: bubbleSort on [5, 3, 1, 4, 2]")
+    result = evaluate(bubbleSort, [5, 3, 1, 4, 2])
+    printEvaluation(result)
 
     assert result["sorted_correctly"], "Sort failed"
     assert result["replay_matches"], "Swap replay mismatch"
@@ -30,11 +36,11 @@ def test_single_evaluate():
     print("  PASSED\n")
 
 
-# --- 2. evaluate_all with default (all algorithms) ---
-def test_evaluate_all_default():
-    print(">>> test_evaluate_all_default: all algorithms on [64, 34, 25, 12, 22, 11]")
+def testEvaluateAllDefault():
+    # Evaluate all sorting algorithms on a standard arbitrary list
+    print(">>> testEvaluateAllDefault: all algorithms on [64, 34, 25, 12, 22, 11]")
     data = [64, 34, 25, 12, 22, 11]
-    results = evaluate_all(data)
+    results = evaluateAll(data)
 
     assert len(results) == len(ALL_ALGORITHMS), f"Expected {len(ALL_ALGORITHMS)} results, got {len(results)}"
 
@@ -43,15 +49,15 @@ def test_evaluate_all_default():
         assert r["replay_matches"], f"{r['algorithm']} swap replay mismatch"
         assert r["elapsed_ms"] >= 0, f"{r['algorithm']} negative time"
 
-    print_comparison_table(results)
+    printComparisonTable(results)
     print("  PASSED\n")
 
 
-# --- 3. evaluate_all with a subset of algorithms ---
-def test_evaluate_all_subset():
-    print(">>> test_evaluate_all_subset: [insertion_sort, quick_sort_hoare] on [9, 1, 5, 3]")
-    subset = [insertion_sort, quick_sort_hoare]
-    results = evaluate_all([9, 1, 5, 3], algorithms=subset)
+def testEvaluateAllSubset():
+    # Evaluate a custom subset of algorithms on a four-element list
+    print(">>> testEvaluateAllSubset: [insertionSort, quickSortHoare] on [9, 1, 5, 3]")
+    subset = [insertionSort, quickSortHoare]
+    results = evaluateAll([9, 1, 5, 3], algorithms=subset)
 
     assert len(results) == 2
     assert results[0]["algorithm"] == "Insertion Sort"
@@ -61,30 +67,30 @@ def test_evaluate_all_subset():
         assert r["sorted_correctly"]
         assert r["replay_matches"]
 
-    print_comparison_table(results)
+    printComparisonTable(results)
     print("  PASSED\n")
 
 
-# --- 4. Best case: already sorted input ---
-def test_best_case():
-    print(">>> test_best_case: all algorithms on sorted [1..10]")
+def testBestCase():
+    # Test best-case scenario on pre-sorted input
+    print(">>> testBestCase: all algorithms on sorted [1..10]")
     data = list(range(1, 11))
-    results = evaluate_all(data)
+    results = evaluateAll(data)
 
     for r in results:
         assert r["sorted_correctly"], f"{r['algorithm']} failed on sorted input"
         assert r["swaps"] == 0 or r["algorithm"] == "Heap Sort", \
             f"{r['algorithm']} did {r['swaps']} swaps on sorted input"
 
-    print_comparison_table(results)
+    printComparisonTable(results)
     print("  PASSED\n")
 
 
-# --- 5. Worst case: reverse sorted input ---
-def test_worst_case():
-    print(">>> test_worst_case: all algorithms on reversed [10..1]")
+def testWorstCase():
+    # Test worst-case scenario on reverse-sorted input
+    print(">>> testWorstCase: all algorithms on reversed [10..1]")
     data = list(range(10, 0, -1))
-    results = evaluate_all(data)
+    results = evaluateAll(data)
 
     for r in results:
         assert r["sorted_correctly"], f"{r['algorithm']} failed on reverse sorted input"
@@ -93,13 +99,13 @@ def test_worst_case():
         assert r["swaps_in_bounds"], \
             f"{r['algorithm']} swaps {r['swaps']} out of bounds ({r['swaps_best']}-{r['swaps_worst']})"
 
-    print_comparison_table(results)
+    printComparisonTable(results)
     print("  PASSED\n")
 
 
-# --- 6. Single element and empty edge cases ---
-def test_edge_cases():
-    print(">>> test_edge_cases: single element and two elements")
+def testEdgeCases():
+    # Test edge cases with single-element and two-element inputs
+    print(">>> testEdgeCases: single element and two elements")
 
     for fn in ALL_ALGORITHMS:
         r1 = evaluate(fn, [42])
@@ -115,54 +121,67 @@ def test_edge_cases():
     print("  PASSED\n")
 
 
-# --- 7. Timing is recorded ---
-def test_timing():
-    print(">>> test_timing: verify elapsed_ms is a positive float for larger input")
+def testTiming():
+    # Verify that execution timing produces non-negative floats
+    print(">>> testTiming: verify elapsed_ms is a positive float for larger input")
     data = list(range(100, 0, -1))
-    result = evaluate(bubble_sort, data)
+    result = evaluate(bubbleSort, data)
     assert isinstance(result["elapsed_ms"], float)
     assert result["elapsed_ms"] >= 0
     print(f"  Bubble sort on {len(data)} elements: {result['elapsed_ms']:.3f} ms")
     print("  PASSED\n")
 
 
-# --- 8. run_scenarios with all algorithms ---
-def test_run_scenarios_all():
-    print(">>> test_run_scenarios_all")
-    run_scenarios()
+def testRunScenariosAll():
+    # Verify scenario runner with all algorithms
+    print(">>> testRunScenariosAll")
+    runScenarios()
     print("  PASSED\n")
 
 
-# --- 9. run_scenarios with a subset ---
-def test_run_scenarios_subset():
-    print(">>> test_run_scenarios_subset: [selection_sort, heap_sort]")
-    run_scenarios(algorithms=[selection_sort, heap_sort])
+def testRunScenariosSubset():
+    # Verify scenario runner with subset of algorithms
+    print(">>> testRunScenariosSubset: [selectionSort, heapSort]")
+    runScenarios(algorithms=[selectionSort, heapSort])
     print("  PASSED\n")
 
 
-# --- 10. print_evaluation for each algorithm ---
-def test_print_evaluation_all():
-    print(">>> test_print_evaluation_all: detailed output for each algorithm on [8, 3, 6, 1, 5]")
+def testPrintEvaluationAll():
+    # Verify detailed output printing for all algorithms on arbitrary list
+    print(">>> testPrintEvaluationAll: detailed output for each algorithm on [8, 3, 6, 1, 5]")
     data = [8, 3, 6, 1, 5]
     for fn in ALL_ALGORITHMS:
         r = evaluate(fn, data)
-        print_evaluation(r)
+        printEvaluation(r)
         assert r["sorted_correctly"]
         assert r["replay_matches"]
     print("  PASSED\n")
 
 
+# Backward compatibility aliases
+test_single_evaluate = testSingleEvaluate
+test_evaluate_all_default = testEvaluateAllDefault
+test_evaluate_all_subset = testEvaluateAllSubset
+test_best_case = testBestCase
+test_worst_case = testWorstCase
+test_edge_cases = testEdgeCases
+test_timing = testTiming
+test_run_scenarios_all = testRunScenariosAll
+test_run_scenarios_subset = testRunScenariosSubset
+test_print_evaluation_all = testPrintEvaluationAll
+
+
 if __name__ == "__main__":
-    test_single_evaluate()
-    test_evaluate_all_default()
-    test_evaluate_all_subset()
-    test_best_case()
-    test_worst_case()
-    test_edge_cases()
-    test_timing()
-    test_run_scenarios_all()
-    test_run_scenarios_subset()
-    test_print_evaluation_all()
+    testSingleEvaluate()
+    testEvaluateAllDefault()
+    testEvaluateAllSubset()
+    testBestCase()
+    testWorstCase()
+    testEdgeCases()
+    testTiming()
+    testRunScenariosAll()
+    testRunScenariosSubset()
+    testPrintEvaluationAll()
     print("\n" + "=" * 60)
     print("  ALL TESTS PASSED")
     print("=" * 60)

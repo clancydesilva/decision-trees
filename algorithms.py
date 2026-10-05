@@ -3,7 +3,8 @@ from math import log2, ceil
 from tracked_list import TrackedList
 
 
-def bubble_sort(arr: TrackedList) -> TrackedList:
+def bubbleSort(arr: TrackedList) -> TrackedList:
+    # Repeatedly step through the list, compare adjacent elements and swap them if out of order
     n = len(arr)
     for i in range(n):
         swapped = False
@@ -12,11 +13,13 @@ def bubble_sort(arr: TrackedList) -> TrackedList:
                 arr.swap(j, j + 1)      # swap out of order pair
                 swapped = True
         if not swapped:
+            # Early exit if no swaps occurred during the pass
             break
     return arr
 
 
-def selection_sort(arr: TrackedList) -> TrackedList:
+def selectionSort(arr: TrackedList) -> TrackedList:
+    # Find the minimum element in the unsorted suffix and place it at the beginning
     n = len(arr)
     for i in range(n):
         min_idx = i
@@ -24,27 +27,30 @@ def selection_sort(arr: TrackedList) -> TrackedList:
             if arr.compare(j, min_idx):  # arr[j] < arr[min_idx]
                 min_idx = j
         if min_idx != i:
-            arr.swap(i, min_idx)  # move minimum to sorted position
+            arr.swap(i, min_idx)  # move minimum to its sorted position
     return arr
 
 
-def insertion_sort(arr: TrackedList) -> TrackedList:
+def insertionSort(arr: TrackedList) -> TrackedList:
+    # Insert each element into its correct position within the already sorted prefix
     n = len(arr)
     for i in range(1, n):
         j = i
         while j > 0 and arr.compare(j, j - 1):  # arr[j] < arr[j - 1]
-            arr.swap(j, j - 1)                  # shift element left
+            arr.swap(j, j - 1)                  # shift element left into sorted position
             j -= 1
     return arr
 
 
-def cocktail_shaker_sort(arr: TrackedList) -> TrackedList:
+def cocktailShakerSort(arr: TrackedList) -> TrackedList:
+    # Bidirectional bubble sort passing alternately left-to-right and right-to-left
     start = 0
     end = len(arr) - 1
     swapped = True
 
     while swapped:
         swapped = False
+        # Forward pass: bubble larger elements to the right
         for i in range(start, end):
             if arr.compare(i + 1, i):  # arr[i] > arr[i + 1]
                 arr.swap(i, i + 1)      # bubble larger right
@@ -56,6 +62,7 @@ def cocktail_shaker_sort(arr: TrackedList) -> TrackedList:
         swapped = False
         end -= 1
 
+        # Backward pass: bubble smaller elements to the left
         for i in range(end - 1, start - 1, -1):
             if arr.compare(i + 1, i):  # arr[i] > arr[i + 1]
                 arr.swap(i, i + 1)      # bubble smaller left
@@ -65,11 +72,13 @@ def cocktail_shaker_sort(arr: TrackedList) -> TrackedList:
     return arr
 
 
-def shell_sort(arr: TrackedList) -> TrackedList:
+def shellSort(arr: TrackedList) -> TrackedList:
+    # Generalisation of insertion sort allowing exchanges of far-apart elements using decreasing gaps
     n = len(arr)
     gap = n // 2
 
     while gap > 0:
+        # Perform gap-spaced insertion sort
         for i in range(gap, n):
             j = i
             while j >= gap and arr.compare(j, j - gap):  # arr[j] < arr[j - gap]
@@ -80,19 +89,21 @@ def shell_sort(arr: TrackedList) -> TrackedList:
     return arr
 
 
-def quick_sort_lomuto(arr: TrackedList, low: int = 0, high: Optional[int] = None) -> TrackedList:
+def quickSortLomuto(arr: TrackedList, low: int = 0, high: Optional[int] = None) -> TrackedList:
+    # Quicksort with Lomuto partition scheme using the rightmost element as pivot
     if high is None:
         high = len(arr) - 1
 
     if low < high:
-        pi = _lomuto_partition(arr, low, high)
-        quick_sort_lomuto(arr, low, pi - 1)
-        quick_sort_lomuto(arr, pi + 1, high)
+        pi = _lomutoPartition(arr, low, high)
+        quickSortLomuto(arr, low, pi - 1)
+        quickSortLomuto(arr, pi + 1, high)
 
     return arr
 
 
-def _lomuto_partition(arr: TrackedList, low: int, high: int) -> int:
+def _lomutoPartition(arr: TrackedList, low: int, high: int) -> int:
+    # Partition array around pivot at high index
     pivot_idx = high
     i = low - 1
 
@@ -107,19 +118,21 @@ def _lomuto_partition(arr: TrackedList, low: int, high: int) -> int:
     return i + 1
 
 
-def quick_sort_hoare(arr: TrackedList, low: int = 0, high: Optional[int] = None) -> TrackedList:
+def quickSortHoare(arr: TrackedList, low: int = 0, high: Optional[int] = None) -> TrackedList:
+    # Quicksort with Hoare two-pointer partition scheme
     if high is None:
         high = len(arr) - 1
 
     if low < high:
-        pi = _hoare_partition(arr, low, high)
-        quick_sort_hoare(arr, low, pi)
-        quick_sort_hoare(arr, pi + 1, high)
+        pi = _hoarePartition(arr, low, high)
+        quickSortHoare(arr, low, pi)
+        quickSortHoare(arr, pi + 1, high)
 
     return arr
 
 
-def _hoare_partition(arr: TrackedList, low: int, high: int) -> int:
+def _hoarePartition(arr: TrackedList, low: int, high: int) -> int:
+    # Two-pointer partition moving inward until out-of-order elements are found and swapped
     pivot_idx = low
     i = low - 1
     j = high + 1
@@ -137,19 +150,22 @@ def _hoare_partition(arr: TrackedList, low: int, high: int) -> int:
             return j
 
         arr.swap(i, j)  # swap elements on wrong sides of pivot
-        # if we moved the pivot, update its tracked index
+        # if the pivot element was moved, update its tracked index
         if i == pivot_idx:
             pivot_idx = j
         elif j == pivot_idx:
             pivot_idx = i
 
 
-def heap_sort(arr: TrackedList) -> TrackedList:
+def heapSort(arr: TrackedList) -> TrackedList:
+    # Build a max-heap and repeatedly extract the maximum root to the sorted suffix
     n = len(arr)
 
+    # Build max heap from bottom up
     for i in range(n // 2 - 1, -1, -1):
         _heapify(arr, n, i)
 
+    # Extract elements one by one from heap
     for i in range(n - 1, 0, -1):
         arr.swap(0, i)       # move max root to sorted end
         _heapify(arr, i, 0)
@@ -158,70 +174,76 @@ def heap_sort(arr: TrackedList) -> TrackedList:
 
 
 def _heapify(arr: TrackedList, n: int, root: int) -> None:
+    # Maintain max-heap property for subtree rooted at root index
     largest = root
     left = 2 * root + 1
     right = 2 * root + 2
 
+    # Compare root with left child
     if left < n and arr.compare(largest, left):    # arr[left] > arr[largest]
         largest = left
 
+    # Compare largest so far with right child
     if right < n and arr.compare(largest, right):  # arr[right] > arr[largest]
         largest = right
 
+    # Swap and continue heapifying if root is not largest
     if largest != root:
         arr.swap(root, largest)                    # swap root with larger child
         _heapify(arr, n, largest)
 
 
-def merge_sort(arr: TrackedList, left: int = 0, right: Optional[int] = None) -> TrackedList:
+def mergeSort(arr: TrackedList, left: int = 0, right: Optional[int] = None) -> TrackedList:
+    # Recursive in-place merge sort dividing array into halves and merging in-place
     if right is None:
         right = len(arr) - 1
 
     if left < right:
         mid = (left + right) // 2
-        merge_sort(arr, left, mid)
-        merge_sort(arr, mid + 1, right)
-        _in_place_merge(arr, left, mid, right)
+        mergeSort(arr, left, mid)
+        mergeSort(arr, mid + 1, right)
+        _inPlaceMerge(arr, left, mid, right)
 
     return arr
 
 
-def _in_place_merge(arr: TrackedList, start: int, mid: int, end: int) -> None:
+def _inPlaceMerge(arr: TrackedList, start: int, mid: int, end: int) -> None:
+    # Merge two sorted adjacent sublists in-place without raw equality comparisons
     start2 = mid + 1
 
-    if not arr.compare(start2, mid):  # already sorted across halves
+    # Check if already sorted across the boundary
+    if not arr.compare(start2, mid):
         return
 
     while start <= mid and start2 <= end:
-        if arr.compare(start, start2) or arr[start] == arr[start2]:  # arr[start] <= arr[start2]
+        if arr.compare(start, start2):  # element at start is already in correct relative position
             start += 1
         else:
+            # Rotate element at start2 into current position at start
             idx = start2
             while idx != start:
-                arr.swap(idx, idx - 1)  # rotate smaller element into position
+                arr.swap(idx, idx - 1)
                 idx -= 1
             start += 1
             mid += 1
             start2 += 1
 
 
-# ---------------------------------------------------------------------------
 # Algorithm metadata: complexity strings and theoretical bound formulas
 # Each entry: bounds are lambda n -> int (exact or tight upper bound)
-# ---------------------------------------------------------------------------
 
 ALGORITHM_INFO = {
-    bubble_sort: {
+    bubbleSort: {
         "name": "Bubble Sort",
         "time_best": "O(n)",
         "time_avg": "O(n²)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: n - 1,                  # one pass, no swaps → early exit
+        "comparisons_best": lambda n: n - 1,                  # one pass, no swaps -> early exit
         "comparisons_worst": lambda n: n * (n - 1) // 2,      # every pair compared
         "swaps_best": lambda n: 0,                             # already sorted
-        "swaps_worst": lambda n: n * (n - 1) // 2,            # reverse sorted → swap every pair
+        "swaps_worst": lambda n: n * (n - 1) // 2,            # reverse sorted -> swap every pair
     },
-    selection_sort: {
+    selectionSort: {
         "name": "Selection Sort",
         "time_best": "O(n²)",
         "time_avg": "O(n²)",
@@ -231,17 +253,17 @@ ALGORITHM_INFO = {
         "swaps_best": lambda n: 0,                             # already sorted
         "swaps_worst": lambda n: n - 1,                        # one swap per position
     },
-    insertion_sort: {
+    insertionSort: {
         "name": "Insertion Sort",
         "time_best": "O(n)",
         "time_avg": "O(n²)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: n - 1,                   # sorted → one compare per element
+        "comparisons_best": lambda n: n - 1,                   # sorted -> one compare per element
         "comparisons_worst": lambda n: n * (n - 1) // 2,      # reverse sorted
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
-    cocktail_shaker_sort: {
+    cocktailShakerSort: {
         "name": "Cocktail Shaker Sort",
         "time_best": "O(n)",
         "time_avg": "O(n²)",
@@ -251,27 +273,27 @@ ALGORITHM_INFO = {
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
-    shell_sort: {
+    shellSort: {
         "name": "Shell Sort",
         "time_best": "O(n log n)",
         "time_avg": "O(n^1.25)",                               # depends on gap sequence
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: max(0, n - 1),                     # sorted → one compare per element per gap
+        "comparisons_best": lambda n: max(0, n - 1),                     # sorted -> one compare per element per gap
         "comparisons_worst": lambda n: n * (n - 1) // 2,
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
-    quick_sort_lomuto: {
+    quickSortLomuto: {
         "name": "Quick Sort (Lomuto)",
         "time_best": "O(n log n)",
         "time_avg": "O(n log n)",
         "time_worst": "O(n²)",
         "comparisons_best": lambda n: max(0, n - 1),                      # best partition splits
-        "comparisons_worst": lambda n: n * (n - 1) // 2,       # already sorted → worst pivot
+        "comparisons_worst": lambda n: n * (n - 1) // 2,       # already sorted -> worst pivot
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
-    quick_sort_hoare: {
+    quickSortHoare: {
         "name": "Quick Sort (Hoare)",
         "time_best": "O(n log n)",
         "time_avg": "O(n log n)",
@@ -281,7 +303,7 @@ ALGORITHM_INFO = {
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 4,             # fewer swaps than Lomuto
     },
-    heap_sort: {
+    heapSort: {
         "name": "Heap Sort",
         "time_best": "O(n log n)",
         "time_avg": "O(n log n)",
@@ -291,7 +313,7 @@ ALGORITHM_INFO = {
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: int(n * log2(max(n, 1))),
     },
-    merge_sort: {
+    mergeSort: {
         "name": "In-Place Merge Sort",
         "time_best": "O(n log n)",
         "time_avg": "O(n log²n)",                              # in-place merge adds overhead
@@ -304,13 +326,41 @@ ALGORITHM_INFO = {
 }
 
 ALL_ALGORITHMS = [
-    bubble_sort,
-    selection_sort,
-    insertion_sort,
-    cocktail_shaker_sort,
-    shell_sort,
-    quick_sort_lomuto,
-    quick_sort_hoare,
-    heap_sort,
-    merge_sort,
+    bubbleSort,
+    selectionSort,
+    insertionSort,
+    cocktailShakerSort,
+    shellSort,
+    quickSortLomuto,
+    quickSortHoare,
+    heapSort,
+    mergeSort,
 ]
+
+# Backward compatibility aliases
+bubble_sort = bubbleSort
+selection_sort = selectionSort
+insertion_sort = insertionSort
+cocktail_shaker_sort = cocktailShakerSort
+shell_sort = shellSort
+quick_sort_lomuto = quickSortLomuto
+_lomuto_partition = _lomutoPartition
+quick_sort_hoare = quickSortHoare
+_hoare_partition = _hoarePartition
+heap_sort = heapSort
+merge_sort = mergeSort
+_in_place_merge = _inPlaceMerge
+
+# Register backward compatible aliases in ALGORITHM_INFO
+for _new_fn, _old_fn in [
+    (bubbleSort, bubble_sort),
+    (selectionSort, selection_sort),
+    (insertionSort, insertion_sort),
+    (cocktailShakerSort, cocktail_shaker_sort),
+    (shellSort, shell_sort),
+    (quickSortLomuto, quick_sort_lomuto),
+    (quickSortHoare, quick_sort_hoare),
+    (heapSort, heap_sort),
+    (mergeSort, merge_sort),
+]:
+    ALGORITHM_INFO[_old_fn] = ALGORITHM_INFO[_new_fn]

@@ -4,26 +4,26 @@ from algorithms import ALGORITHM_INFO, ALL_ALGORITHMS
 
 
 def evaluate(sort_fn, data):
-    """Run a sorting algorithm on data and return a results dict with actual
-    counts, theoretical bounds, and whether counts fall within bounds."""
-
+    # Run a sorting algorithm on data and return metrics including bounds and verification
     info = ALGORITHM_INFO[sort_fn]
     n = len(data)
     tracker = TrackedList(data)
 
+    # Measure execution time
     t0 = perf_counter()
     sort_fn(tracker)
     elapsed_ms = (perf_counter() - t0) * 1000
 
+    # Verify if array sorted correctly
     sorted_correctly = tracker.array == sorted(data)
 
-    # replay swaps on original to verify
+    # Replay recorded swaps on untouched original list to verify correctness
     replayed = list(tracker.original)
     for i, j in tracker.swaps:
         replayed[i], replayed[j] = replayed[j], replayed[i]
     replay_matches = replayed == tracker.array
 
-    # theoretical bounds
+    # Calculate theoretical comparison and swap bounds for input size n
     cmp_best = info["comparisons_best"](n)
     cmp_worst = info["comparisons_worst"](n)
     swap_best = info["swaps_best"](n)
@@ -36,14 +36,14 @@ def evaluate(sort_fn, data):
         "time_worst": info["time_worst"],
         "n": n,
         "elapsed_ms": elapsed_ms,
-        "comparisons": tracker.comparison_count,
+        "comparisons": tracker.comparisonCount,
         "comparisons_best": cmp_best,
         "comparisons_worst": cmp_worst,
-        "comparisons_in_bounds": cmp_best <= tracker.comparison_count <= cmp_worst,
-        "swaps": tracker.swap_count,
+        "comparisons_in_bounds": cmp_best <= tracker.comparisonCount <= cmp_worst,
+        "swaps": tracker.swapCount,
         "swaps_best": swap_best,
         "swaps_worst": swap_worst,
-        "swaps_in_bounds": swap_best <= tracker.swap_count <= swap_worst,
+        "swaps_in_bounds": swap_best <= tracker.swapCount <= swap_worst,
         "sorted_correctly": sorted_correctly,
         "replay_matches": replay_matches,
         "original": tracker.original,
@@ -53,15 +53,15 @@ def evaluate(sort_fn, data):
     }
 
 
-def evaluate_all(data, algorithms=None):
-    """Run all (or selected) algorithms on the same data and return a list of results."""
+def evaluateAll(data, algorithms=None):
+    # Run all (or selected) algorithms on identical input data and return result dicts
     if algorithms is None:
         algorithms = ALL_ALGORITHMS
     return [evaluate(fn, data) for fn in algorithms]
 
 
-def print_evaluation(result):
-    """Pretty-print a single evaluation result."""
+def printEvaluation(result):
+    # Pretty-print a single algorithm evaluation result
     r = result
     print(f"\n{'=' * 60}")
     print(f"  {r['algorithm']}")
@@ -82,7 +82,8 @@ def print_evaluation(result):
     print(f"{'=' * 60}")
 
 
-def print_trace(sort_fn, data):
+def printTrace(sort_fn, data):
+    # Print an interleaved step-by-step trace of comparisons and swaps
     info = ALGORITHM_INFO[sort_fn]
     tracker = TrackedList(list(data))
     sort_fn(tracker)
@@ -110,8 +111,8 @@ def print_trace(sort_fn, data):
     print(f"{'=' * 60}")
 
 
-def print_comparison_table(results):
-    """Print a comparison table across multiple algorithms."""
+def printComparisonTable(results):
+    # Print a formatted table comparing performance across multiple algorithms
     print(f"\n{'Algorithm':<24} | {'Cmp':<6} | {'Cmp Range':<16} | {'Swp':<6} | {'Swp Range':<16} | {'Time (ms)':<10} | {'Complexity':<12} | {'OK'}")
     print("-" * 125)
     for r in results:
@@ -123,8 +124,8 @@ def print_comparison_table(results):
         )
 
 
-def run_scenarios(algorithms=None):
-    """Run algorithms against sorted, reversed, and random-ish inputs to show best/worst/avg behavior."""
+def runScenarios(algorithms=None):
+    # Run algorithms against sorted, reversed, and pseudo-random inputs
     if algorithms is None:
         algorithms = ALL_ALGORITHMS
 
@@ -140,13 +141,21 @@ def run_scenarios(algorithms=None):
         print(f"  Scenario: {label}")
         print(f"  Input: {data}")
         print(f"{'#' * 60}")
-        results = evaluate_all(data, algorithms)
-        print_comparison_table(results)
+        results = evaluateAll(data, algorithms)
+        printComparisonTable(results)
+
+
+# Backward compatibility aliases
+evaluate_all = evaluateAll
+print_evaluation = printEvaluation
+print_trace = printTrace
+print_comparison_table = printComparisonTable
+run_scenarios = runScenarios
+
 
 if __name__ == "__main__":
-    from algorithms import insertion_sort, bubble_sort
+    from algorithms import insertionSort, bubbleSort
 
-    run_scenarios()
-
-    print_trace(insertion_sort, [3, 2, 1])
-    print_trace(bubble_sort, [5, 3, 1, 4, 2])
+    runScenarios()
+    printTrace(insertionSort, [3, 2, 1])
+    printTrace(bubbleSort, [5, 3, 1, 4, 2])
