@@ -1,0 +1,44 @@
+{
+  "algorithms": [
+    {
+      "id": "bubbleSort",
+      "name": "Bubble Sort"
+    },
+    {
+      "id": "selectionSort",
+      "name": "Selection Sort"
+    },
+    {
+      "id": "insertionSort",
+      "name": "Insertion Sort"
+    },
+    {
+      "id": "cocktailShakerSort",
+      "name": "Cocktailshaker Sort"
+    },
+    {
+      "id": "shellSort",
+      "name": "Shell Sort"
+    },
+    {
+      "id": "quickSortLomuto",
+      "name": "Quick Sortlomuto"
+    },
+    {
+      "id": "quickSortHoare",
+      "name": "Quick Sorthoare"
+    },
+    {
+      "id": "heapSort",
+      "name": "Heap Sort"
+    },
+    {
+      "id": "mergeSort",
+      "name": "Merge Sort"
+    }
+  ],
+  "supported_n": [
+    3,
+    4
+  ]
+}

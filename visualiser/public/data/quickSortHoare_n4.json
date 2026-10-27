@@ -1,0 +1,2573 @@
+{
+  "algorithm": "Quick Sort (Hoare)",
+  "algorithm_id": "quickSortHoare",
+  "n": 4,
+  "print_output": "a[0] < a[0]?\n`-- N: a[0] < a[3]?\n    |-- Y: a[0] < a[2]?\n    |   |-- Y: a[0] < a[1]?\n    |   |   |-- Y: a[0] < a[0]?\n    |   |   |   `-- N: a[1] < a[1]?\n    |   |   |       `-- N: a[1] < a[3]?\n    |   |   |           |-- Y: a[1] < a[2]?\n    |   |   |           |   |-- Y: a[1] < a[1]?\n    |   |   |           |   |   `-- N: a[2] < a[2]?\n    |   |   |           |   |       `-- N: a[2] < a[3]?\n    |   |   |           |   |           |-- Y: a[2] < a[2]?\n    |   |   |           |   |           |   `-- N: LEAF [(1, 2, 3, 4)]\n    |   |   |           |   |           `-- N: a[3] < a[3]?\n    |   |   |           |   |               `-- N: a[3] < a[2]?\n    |   |   |           |   |                   `-- N: LEAF [(1, 2, 4, 3)]\n    |   |   |           |   `-- N: a[2] < a[2]?\n    |   |   |           |       `-- N: a[2] < a[1]?\n    |   |   |           |           `-- N: a[2] < a[2]?\n    |   |   |           |               `-- N: a[2] < a[3]?\n    |   |   |           |                   `-- Y: a[2] < a[2]?\n    |   |   |           |                       `-- N: LEAF [(1, 3, 2, 4)]\n    |   |   |           `-- N: a[2] < a[3]?\n    |   |   |               |-- Y: a[3] < a[3]?\n    |   |   |               |   `-- N: a[3] < a[2]?\n    |   |   |               |       `-- N: a[1] < a[1]?\n    |   |   |               |           `-- N: a[1] < a[2]?\n    |   |   |               |               |-- Y: a[1] < a[1]?\n    |   |   |               |               |   `-- N: LEAF [(1, 4, 3, 2)]\n    |   |   |               |               `-- N: a[2] < a[2]?\n    |   |   |               |                   `-- N: a[2] < a[1]?\n    |   |   |               |                       `-- N: LEAF [(1, 4, 2, 3)]\n    |   |   |               `-- N: a[3] < a[2]?\n    |   |   |                   `-- Y: a[3] < a[1]?\n    |   |   |                       `-- N: a[2] < a[2]?\n    |   |   |                           `-- N: a[2] < a[3]?\n    |   |   |                               `-- N: a[3] < a[3]?\n    |   |   |                                   `-- N: a[3] < a[2]?\n    |   |   |                                       `-- N: LEAF [(1, 3, 4, 2)]\n    |   |   `-- N: a[1] < a[1]?\n    |   |       `-- N: a[1] < a[0]?\n    |   |           `-- N: a[1] < a[1]?\n    |   |               `-- N: a[1] < a[3]?\n    |   |                   `-- Y: a[1] < a[2]?\n    |   |                       `-- Y: a[1] < a[1]?\n    |   |                           `-- N: a[2] < a[2]?\n    |   |                               `-- N: a[2] < a[3]?\n    |   |                                   |-- Y: a[2] < a[2]?\n    |   |                                   |   `-- N: LEAF [(2, 1, 3, 4)]\n    |   |                                   `-- N: a[3] < a[3]?\n    |   |                                       `-- N: a[3] < a[2]?\n    |   |                                           `-- N: LEAF [(2, 1, 4, 3)]\n    |   `-- N: a[1] < a[2]?\n    |       |-- Y: a[2] < a[2]?\n    |       |   `-- N: a[2] < a[1]?\n    |       |       `-- N: a[0] < a[0]?\n    |       |           `-- N: a[0] < a[1]?\n    |       |               |-- Y: a[0] < a[0]?\n    |       |               |   `-- N: a[2] < a[2]?\n    |       |               |       `-- N: a[2] < a[3]?\n    |       |               |           `-- Y: a[2] < a[2]?\n    |       |               |               `-- N: LEAF [(3, 2, 1, 4)]\n    |       |               `-- N: a[1] < a[1]?\n    |       |                   `-- N: a[1] < a[0]?\n    |       |                       `-- N: a[2] < a[2]?\n    |       |                           `-- N: a[2] < a[3]?\n    |       |                               `-- Y: a[2] < a[2]?\n    |       |                                   `-- N: LEAF [(3, 1, 2, 4)]\n    |       `-- N: a[2] < a[1]?\n    |           `-- Y: a[2] < a[0]?\n    |               `-- N: a[1] < a[1]?\n    |                   `-- N: a[1] < a[3]?\n    |                       |-- Y: a[1] < a[2]?\n    |                       |   `-- N: a[2] < a[2]?\n    |                       |       `-- N: a[2] < a[1]?\n    |                       |           `-- N: a[2] < a[2]?\n    |                       |               `-- N: a[2] < a[3]?\n    |                       |                   `-- Y: a[2] < a[2]?\n    |                       |                       `-- N: LEAF [(2, 3, 1, 4)]\n    |                       `-- N: a[2] < a[3]?\n    |                           `-- Y: a[3] < a[3]?\n    |                               `-- N: a[3] < a[2]?\n    |                                   `-- N: a[1] < a[1]?\n    |                                       `-- N: a[1] < a[2]?\n    |                                           `-- N: a[2] < a[2]?\n    |                                               `-- N: a[2] < a[1]?\n    |                                                   `-- N: LEAF [(2, 4, 1, 3)]\n    `-- N: a[1] < a[3]?\n        |-- Y: a[2] < a[3]?\n        |   |-- Y: a[3] < a[3]?\n        |   |   `-- N: a[3] < a[2]?\n        |   |       `-- N: a[0] < a[0]?\n        |   |           `-- N: a[0] < a[2]?\n        |   |               |-- Y: a[0] < a[1]?\n        |   |               |   |-- Y: a[0] < a[0]?\n        |   |               |   |   `-- N: a[1] < a[1]?\n        |   |               |   |       `-- N: a[1] < a[2]?\n        |   |               |   |           |-- Y: a[1] < a[1]?\n        |   |               |   |           |   `-- N: LEAF [(4, 2, 3, 1)]\n        |   |               |   |           `-- N: a[2] < a[2]?\n        |   |               |   |               `-- N: a[2] < a[1]?\n        |   |               |   |                   `-- N: LEAF [(4, 3, 2, 1)]\n        |   |               |   `-- N: a[1] < a[1]?\n        |   |               |       `-- N: a[1] < a[0]?\n        |   |               |           `-- N: a[1] < a[1]?\n        |   |               |               `-- N: a[1] < a[2]?\n        |   |               |                   `-- Y: a[1] < a[1]?\n        |   |               |                       `-- N: LEAF [(4, 1, 3, 2)]\n        |   |               `-- N: a[1] < a[2]?\n        |   |                   |-- Y: a[2] < a[2]?\n        |   |                   |   `-- N: a[2] < a[1]?\n        |   |                   |       `-- N: a[0] < a[0]?\n        |   |                   |           `-- N: a[0] < a[1]?\n        |   |                   |               |-- Y: a[0] < a[0]?\n        |   |                   |               |   `-- N: LEAF [(4, 2, 1, 3)]\n        |   |                   |               `-- N: a[1] < a[1]?\n        |   |                   |                   `-- N: a[1] < a[0]?\n        |   |                   |                       `-- N: LEAF [(4, 1, 2, 3)]\n        |   |                   `-- N: a[2] < a[1]?\n        |   |                       `-- Y: a[2] < a[0]?\n        |   |                           `-- N: a[1] < a[1]?\n        |   |                               `-- N: a[1] < a[2]?\n        |   |                                   `-- N: a[2] < a[2]?\n        |   |                                       `-- N: a[2] < a[1]?\n        |   |                                           `-- N: LEAF [(4, 3, 1, 2)]\n        |   `-- N: a[3] < a[2]?\n        |       `-- Y: a[3] < a[1]?\n        |           `-- N: a[0] < a[0]?\n        |               `-- N: a[0] < a[1]?\n        |                   |-- Y: a[0] < a[0]?\n        |                   |   `-- N: a[2] < a[2]?\n        |                   |       `-- N: a[2] < a[3]?\n        |                   |           `-- N: a[3] < a[3]?\n        |                   |               `-- N: a[3] < a[2]?\n        |                   |                   `-- N: LEAF [(3, 2, 4, 1)]\n        |                   `-- N: a[1] < a[1]?\n        |                       `-- N: a[1] < a[0]?\n        |                           `-- N: a[2] < a[2]?\n        |                               `-- N: a[2] < a[3]?\n        |                                   `-- N: a[3] < a[3]?\n        |                                       `-- N: a[3] < a[2]?\n        |                                           `-- N: LEAF [(3, 1, 4, 2)]\n        `-- N: a[3] < a[2]?\n            |-- Y: a[3] < a[1]?\n            |   `-- Y: a[3] < a[0]?\n            |       `-- N: a[1] < a[1]?\n            |           `-- N: a[1] < a[3]?\n            |               `-- N: a[2] < a[3]?\n            |                   |-- Y: a[3] < a[3]?\n            |                   |   `-- N: a[3] < a[2]?\n            |                   |       `-- N: a[1] < a[1]?\n            |                   |           `-- N: a[1] < a[2]?\n            |                   |               `-- Y: a[1] < a[1]?\n            |                   |                   `-- N: LEAF [(2, 4, 3, 1)]\n            |                   `-- N: a[3] < a[2]?\n            |                       `-- Y: a[3] < a[1]?\n            |                           `-- N: a[2] < a[2]?\n            |                               `-- N: a[2] < a[3]?\n            |                                   `-- N: a[3] < a[3]?\n            |                                       `-- N: a[3] < a[2]?\n            |                                           `-- N: LEAF [(2, 3, 4, 1)]\n            `-- N: a[2] < a[3]?\n                `-- N: a[3] < a[1]?\n                    `-- N: a[0] < a[0]?\n                        `-- N: a[0] < a[1]?\n                            |-- Y: a[0] < a[0]?\n                            |   `-- N: a[2] < a[2]?\n                            |       `-- N: a[2] < a[3]?\n                            |           `-- N: a[3] < a[3]?\n                            |               `-- N: a[3] < a[2]?\n                            |                   `-- N: LEAF [(3, 4, 2, 1)]\n                            `-- N: a[1] < a[1]?\n                                `-- N: a[1] < a[0]?\n                                    `-- N: a[2] < a[2]?\n                                        `-- N: a[2] < a[3]?\n                                            `-- N: a[3] < a[3]?\n                                                `-- N: a[3] < a[2]?\n                                                    `-- N: LEAF [(3, 4, 1, 2)]\n",
+  "summary": "DecisionTree: Quick Sort (Hoare), n=4\n  Permutations:     24\n  Leaves:           24\n  Internal nodes:   154\n  Total nodes:      178\n  Min depth:        12\n  Max depth:        15\n  Avg depth:        13.67\n  All leaves valid: True",
+  "stats": {
+    "permutations": 24,
+    "leaves": 24,
+    "internal_nodes": 154,
+    "total_nodes": 178,
+    "min_depth": 12,
+    "max_depth": 15,
+    "avg_depth": 13.67,
+    "all_valid": true
+  },
+  "tree": {
+    "name": "a[0] < a[0]?",
+    "attributes": {
+      "type": "comparison",
+      "i": 0,
+      "j": 0
+    },
+    "children": [
+      {
+        "name": "a[0] < a[3]?",
+        "attributes": {
+          "type": "comparison",
+          "i": 0,
+          "j": 3,
+          "branch": "No"
+        },
+        "children": [
+          {
+            "name": "a[0] < a[2]?",
+            "attributes": {
+              "type": "comparison",
+              "i": 0,
+              "j": 2,
+              "branch": "Yes"
+            },
+            "children": [
+              {
+                "name": "a[0] < a[1]?",
+                "attributes": {
+                  "type": "comparison",
+                  "i": 0,
+                  "j": 1,
+                  "branch": "Yes"
+                },
+                "children": [
+                  {
+                    "name": "a[0] < a[0]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 0,
+                      "j": 0,
+                      "branch": "Yes"
+                    },
+                    "children": [
+                      {
+                        "name": "a[1] < a[1]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 1,
+                          "j": 1,
+                          "branch": "No"
+                        },
+                        "children": [
+                          {
+                            "name": "a[1] < a[3]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 1,
+                              "j": 3,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[1] < a[2]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 1,
+                                  "j": 2,
+                                  "branch": "Yes"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[1] < a[1]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 1,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[3]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 3,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 2,
+                                                  "branch": "Yes"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "Leaf (1)",
+                                                    "attributes": {
+                                                      "type": "leaf",
+                                                      "count": 1,
+                                                      "branch": "No",
+                                                      "input": "[1, 2, 3, 4]",
+                                                      "output": "[1, 2, 3, 4]"
+                                                    },
+                                                    "permutations": [
+                                                      {
+                                                        "input": [
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4
+                                                        ],
+                                                        "output": [
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4
+                                                        ],
+                                                        "swaps": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "name": "a[3] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 3,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[1, 2, 4, 3]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              1,
+                                                              2,
+                                                              4,
+                                                              3
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                2,
+                                                                3
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[2] < a[2]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 2,
+                                      "j": 2,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[1]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 1,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[2] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 2,
+                                                      "branch": "Yes"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[1, 3, 2, 4]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              1,
+                                                              3,
+                                                              2,
+                                                              4
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                1,
+                                                                2
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "name": "a[2] < a[3]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 2,
+                                  "j": 3,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[3] < a[3]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 3,
+                                      "j": 3,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[3] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 3,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[1] < a[1]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 1,
+                                              "j": 1,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 2,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[1]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 1,
+                                                      "branch": "Yes"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[1, 4, 3, 2]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              1,
+                                                              4,
+                                                              3,
+                                                              2
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                1,
+                                                                3
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "name": "a[2] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[2] < a[1]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 2,
+                                                          "j": 1,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[1, 4, 2, 3]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  1,
+                                                                  4,
+                                                                  2,
+                                                                  3
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    1,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    1,
+                                                                    2
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[3] < a[2]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 3,
+                                      "j": 2,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[3] < a[1]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 3,
+                                          "j": 1,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[3] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 3,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[1, 3, 4, 2]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  1,
+                                                                  3,
+                                                                  4,
+                                                                  2
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    1,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    2,
+                                                                    3
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "a[1] < a[1]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 1,
+                      "j": 1,
+                      "branch": "No"
+                    },
+                    "children": [
+                      {
+                        "name": "a[1] < a[0]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 1,
+                          "j": 0,
+                          "branch": "No"
+                        },
+                        "children": [
+                          {
+                            "name": "a[1] < a[1]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 1,
+                              "j": 1,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[1] < a[3]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 1,
+                                  "j": 3,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[1] < a[2]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 2,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[1] < a[1]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 1,
+                                          "j": 1,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[2] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 2,
+                                                      "branch": "Yes"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[2, 1, 3, 4]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              2,
+                                                              1,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                0,
+                                                                1
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "name": "a[3] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[3] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 3,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[2, 1, 4, 3]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  2,
+                                                                  1,
+                                                                  4,
+                                                                  3
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    1
+                                                                  ],
+                                                                  [
+                                                                    2,
+                                                                    3
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "a[1] < a[2]?",
+                "attributes": {
+                  "type": "comparison",
+                  "i": 1,
+                  "j": 2,
+                  "branch": "No"
+                },
+                "children": [
+                  {
+                    "name": "a[2] < a[2]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 2,
+                      "j": 2,
+                      "branch": "Yes"
+                    },
+                    "children": [
+                      {
+                        "name": "a[2] < a[1]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 2,
+                          "j": 1,
+                          "branch": "No"
+                        },
+                        "children": [
+                          {
+                            "name": "a[0] < a[0]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 0,
+                              "j": 0,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[0] < a[1]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 0,
+                                  "j": 1,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[0] < a[0]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 0,
+                                      "j": 0,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[3]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 3,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 2,
+                                                  "branch": "Yes"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "Leaf (1)",
+                                                    "attributes": {
+                                                      "type": "leaf",
+                                                      "count": 1,
+                                                      "branch": "No",
+                                                      "input": "[3, 2, 1, 4]",
+                                                      "output": "[1, 2, 3, 4]"
+                                                    },
+                                                    "permutations": [
+                                                      {
+                                                        "input": [
+                                                          3,
+                                                          2,
+                                                          1,
+                                                          4
+                                                        ],
+                                                        "output": [
+                                                          1,
+                                                          2,
+                                                          3,
+                                                          4
+                                                        ],
+                                                        "swaps": [
+                                                          [
+                                                            0,
+                                                            2
+                                                          ]
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[1] < a[1]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 1,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[1] < a[0]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 1,
+                                          "j": 0,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[2] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 2,
+                                                      "branch": "Yes"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[3, 1, 2, 4]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              3,
+                                                              1,
+                                                              2,
+                                                              4
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                0,
+                                                                2
+                                                              ],
+                                                              [
+                                                                0,
+                                                                1
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "a[2] < a[1]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 2,
+                      "j": 1,
+                      "branch": "No"
+                    },
+                    "children": [
+                      {
+                        "name": "a[2] < a[0]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 2,
+                          "j": 0,
+                          "branch": "Yes"
+                        },
+                        "children": [
+                          {
+                            "name": "a[1] < a[1]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 1,
+                              "j": 1,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[1] < a[3]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 1,
+                                  "j": 3,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[1] < a[2]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 2,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[1]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 1,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 2,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[2] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[2] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 2,
+                                                          "j": 2,
+                                                          "branch": "Yes"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[2, 3, 1, 4]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  2,
+                                                                  3,
+                                                                  1,
+                                                                  4
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    2
+                                                                  ],
+                                                                  [
+                                                                    1,
+                                                                    2
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[2] < a[3]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 2,
+                                      "j": 3,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[3] < a[3]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 3,
+                                          "j": 3,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[3] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 3,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[1]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 1,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[2] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 2,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "a[2] < a[1]?",
+                                                            "attributes": {
+                                                              "type": "comparison",
+                                                              "i": 2,
+                                                              "j": 1,
+                                                              "branch": "No"
+                                                            },
+                                                            "children": [
+                                                              {
+                                                                "name": "Leaf (1)",
+                                                                "attributes": {
+                                                                  "type": "leaf",
+                                                                  "count": 1,
+                                                                  "branch": "No",
+                                                                  "input": "[2, 4, 1, 3]",
+                                                                  "output": "[1, 2, 3, 4]"
+                                                                },
+                                                                "permutations": [
+                                                                  {
+                                                                    "input": [
+                                                                      2,
+                                                                      4,
+                                                                      1,
+                                                                      3
+                                                                    ],
+                                                                    "output": [
+                                                                      1,
+                                                                      2,
+                                                                      3,
+                                                                      4
+                                                                    ],
+                                                                    "swaps": [
+                                                                      [
+                                                                        0,
+                                                                        2
+                                                                      ],
+                                                                      [
+                                                                        1,
+                                                                        3
+                                                                      ],
+                                                                      [
+                                                                        1,
+                                                                        2
+                                                                      ]
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "a[1] < a[3]?",
+            "attributes": {
+              "type": "comparison",
+              "i": 1,
+              "j": 3,
+              "branch": "No"
+            },
+            "children": [
+              {
+                "name": "a[2] < a[3]?",
+                "attributes": {
+                  "type": "comparison",
+                  "i": 2,
+                  "j": 3,
+                  "branch": "Yes"
+                },
+                "children": [
+                  {
+                    "name": "a[3] < a[3]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 3,
+                      "j": 3,
+                      "branch": "Yes"
+                    },
+                    "children": [
+                      {
+                        "name": "a[3] < a[2]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 3,
+                          "j": 2,
+                          "branch": "No"
+                        },
+                        "children": [
+                          {
+                            "name": "a[0] < a[0]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 0,
+                              "j": 0,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[0] < a[2]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 0,
+                                  "j": 2,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[0] < a[1]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 0,
+                                      "j": 1,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[0] < a[0]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 0,
+                                          "j": 0,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[1] < a[1]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 1,
+                                              "j": 1,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 2,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[1]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 1,
+                                                      "branch": "Yes"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[4, 2, 3, 1]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              4,
+                                                              2,
+                                                              3,
+                                                              1
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                0,
+                                                                3
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "name": "a[2] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[2] < a[1]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 2,
+                                                          "j": 1,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[4, 3, 2, 1]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  4,
+                                                                  3,
+                                                                  2,
+                                                                  1
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    1,
+                                                                    2
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "name": "a[1] < a[1]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 1,
+                                          "j": 1,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[1] < a[0]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 1,
+                                              "j": 0,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[1]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 1,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[1] < a[1]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 1,
+                                                          "j": 1,
+                                                          "branch": "Yes"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[4, 1, 3, 2]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  4,
+                                                                  1,
+                                                                  3,
+                                                                  2
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    0,
+                                                                    1
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[1] < a[2]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 2,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[1]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 1,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[0] < a[0]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 0,
+                                                  "j": 0,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[0] < a[1]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 0,
+                                                      "j": 1,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[0] < a[0]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 0,
+                                                          "j": 0,
+                                                          "branch": "Yes"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[4, 2, 1, 3]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  4,
+                                                                  2,
+                                                                  1,
+                                                                  3
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    0,
+                                                                    2
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "name": "a[1] < a[1]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 1,
+                                                          "j": 1,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "a[1] < a[0]?",
+                                                            "attributes": {
+                                                              "type": "comparison",
+                                                              "i": 1,
+                                                              "j": 0,
+                                                              "branch": "No"
+                                                            },
+                                                            "children": [
+                                                              {
+                                                                "name": "Leaf (1)",
+                                                                "attributes": {
+                                                                  "type": "leaf",
+                                                                  "count": 1,
+                                                                  "branch": "No",
+                                                                  "input": "[4, 1, 2, 3]",
+                                                                  "output": "[1, 2, 3, 4]"
+                                                                },
+                                                                "permutations": [
+                                                                  {
+                                                                    "input": [
+                                                                      4,
+                                                                      1,
+                                                                      2,
+                                                                      3
+                                                                    ],
+                                                                    "output": [
+                                                                      1,
+                                                                      2,
+                                                                      3,
+                                                                      4
+                                                                    ],
+                                                                    "swaps": [
+                                                                      [
+                                                                        0,
+                                                                        3
+                                                                      ],
+                                                                      [
+                                                                        0,
+                                                                        2
+                                                                      ],
+                                                                      [
+                                                                        0,
+                                                                        1
+                                                                      ]
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "name": "a[2] < a[1]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 1,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[0]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 0,
+                                              "branch": "Yes"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[1]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 1,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[2] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 2,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "a[2] < a[1]?",
+                                                            "attributes": {
+                                                              "type": "comparison",
+                                                              "i": 2,
+                                                              "j": 1,
+                                                              "branch": "No"
+                                                            },
+                                                            "children": [
+                                                              {
+                                                                "name": "Leaf (1)",
+                                                                "attributes": {
+                                                                  "type": "leaf",
+                                                                  "count": 1,
+                                                                  "branch": "No",
+                                                                  "input": "[4, 3, 1, 2]",
+                                                                  "output": "[1, 2, 3, 4]"
+                                                                },
+                                                                "permutations": [
+                                                                  {
+                                                                    "input": [
+                                                                      4,
+                                                                      3,
+                                                                      1,
+                                                                      2
+                                                                    ],
+                                                                    "output": [
+                                                                      1,
+                                                                      2,
+                                                                      3,
+                                                                      4
+                                                                    ],
+                                                                    "swaps": [
+                                                                      [
+                                                                        0,
+                                                                        3
+                                                                      ],
+                                                                      [
+                                                                        0,
+                                                                        2
+                                                                      ],
+                                                                      [
+                                                                        1,
+                                                                        2
+                                                                      ]
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "a[3] < a[2]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 3,
+                      "j": 2,
+                      "branch": "No"
+                    },
+                    "children": [
+                      {
+                        "name": "a[3] < a[1]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 3,
+                          "j": 1,
+                          "branch": "Yes"
+                        },
+                        "children": [
+                          {
+                            "name": "a[0] < a[0]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 0,
+                              "j": 0,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[0] < a[1]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 0,
+                                  "j": 1,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[0] < a[0]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 0,
+                                      "j": 0,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[3]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 3,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[3] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 3,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[3, 2, 4, 1]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              3,
+                                                              2,
+                                                              4,
+                                                              1
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                0,
+                                                                3
+                                                              ],
+                                                              [
+                                                                2,
+                                                                3
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[1] < a[1]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 1,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[1] < a[0]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 1,
+                                          "j": 0,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[3] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 3,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[3, 1, 4, 2]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  3,
+                                                                  1,
+                                                                  4,
+                                                                  2
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    0,
+                                                                    1
+                                                                  ],
+                                                                  [
+                                                                    2,
+                                                                    3
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "a[3] < a[2]?",
+                "attributes": {
+                  "type": "comparison",
+                  "i": 3,
+                  "j": 2,
+                  "branch": "No"
+                },
+                "children": [
+                  {
+                    "name": "a[3] < a[1]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 3,
+                      "j": 1,
+                      "branch": "Yes"
+                    },
+                    "children": [
+                      {
+                        "name": "a[3] < a[0]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 3,
+                          "j": 0,
+                          "branch": "Yes"
+                        },
+                        "children": [
+                          {
+                            "name": "a[1] < a[1]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 1,
+                              "j": 1,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[1] < a[3]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 1,
+                                  "j": 3,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[2] < a[3]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 2,
+                                      "j": 3,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[3] < a[3]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 3,
+                                          "j": 3,
+                                          "branch": "Yes"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[3] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 3,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[1] < a[1]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 1,
+                                                  "j": 1,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[1] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 1,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[1] < a[1]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 1,
+                                                          "j": 1,
+                                                          "branch": "Yes"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[2, 4, 3, 1]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  2,
+                                                                  4,
+                                                                  3,
+                                                                  1
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    1,
+                                                                    3
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "name": "a[3] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 3,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[3] < a[1]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 3,
+                                              "j": 1,
+                                              "branch": "Yes"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[2]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 2,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[2] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 2,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[3] < a[3]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 3,
+                                                          "j": 3,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "a[3] < a[2]?",
+                                                            "attributes": {
+                                                              "type": "comparison",
+                                                              "i": 3,
+                                                              "j": 2,
+                                                              "branch": "No"
+                                                            },
+                                                            "children": [
+                                                              {
+                                                                "name": "Leaf (1)",
+                                                                "attributes": {
+                                                                  "type": "leaf",
+                                                                  "count": 1,
+                                                                  "branch": "No",
+                                                                  "input": "[2, 3, 4, 1]",
+                                                                  "output": "[1, 2, 3, 4]"
+                                                                },
+                                                                "permutations": [
+                                                                  {
+                                                                    "input": [
+                                                                      2,
+                                                                      3,
+                                                                      4,
+                                                                      1
+                                                                    ],
+                                                                    "output": [
+                                                                      1,
+                                                                      2,
+                                                                      3,
+                                                                      4
+                                                                    ],
+                                                                    "swaps": [
+                                                                      [
+                                                                        0,
+                                                                        3
+                                                                      ],
+                                                                      [
+                                                                        1,
+                                                                        3
+                                                                      ],
+                                                                      [
+                                                                        2,
+                                                                        3
+                                                                      ]
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "a[2] < a[3]?",
+                    "attributes": {
+                      "type": "comparison",
+                      "i": 2,
+                      "j": 3,
+                      "branch": "No"
+                    },
+                    "children": [
+                      {
+                        "name": "a[3] < a[1]?",
+                        "attributes": {
+                          "type": "comparison",
+                          "i": 3,
+                          "j": 1,
+                          "branch": "No"
+                        },
+                        "children": [
+                          {
+                            "name": "a[0] < a[0]?",
+                            "attributes": {
+                              "type": "comparison",
+                              "i": 0,
+                              "j": 0,
+                              "branch": "No"
+                            },
+                            "children": [
+                              {
+                                "name": "a[0] < a[1]?",
+                                "attributes": {
+                                  "type": "comparison",
+                                  "i": 0,
+                                  "j": 1,
+                                  "branch": "No"
+                                },
+                                "children": [
+                                  {
+                                    "name": "a[0] < a[0]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 0,
+                                      "j": 0,
+                                      "branch": "Yes"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[2] < a[2]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 2,
+                                          "j": 2,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[3]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 3,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[3] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 3,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[2]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 2,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "Leaf (1)",
+                                                        "attributes": {
+                                                          "type": "leaf",
+                                                          "count": 1,
+                                                          "branch": "No",
+                                                          "input": "[3, 4, 2, 1]",
+                                                          "output": "[1, 2, 3, 4]"
+                                                        },
+                                                        "permutations": [
+                                                          {
+                                                            "input": [
+                                                              3,
+                                                              4,
+                                                              2,
+                                                              1
+                                                            ],
+                                                            "output": [
+                                                              1,
+                                                              2,
+                                                              3,
+                                                              4
+                                                            ],
+                                                            "swaps": [
+                                                              [
+                                                                0,
+                                                                3
+                                                              ],
+                                                              [
+                                                                1,
+                                                                2
+                                                              ],
+                                                              [
+                                                                2,
+                                                                3
+                                                              ]
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "name": "a[1] < a[1]?",
+                                    "attributes": {
+                                      "type": "comparison",
+                                      "i": 1,
+                                      "j": 1,
+                                      "branch": "No"
+                                    },
+                                    "children": [
+                                      {
+                                        "name": "a[1] < a[0]?",
+                                        "attributes": {
+                                          "type": "comparison",
+                                          "i": 1,
+                                          "j": 0,
+                                          "branch": "No"
+                                        },
+                                        "children": [
+                                          {
+                                            "name": "a[2] < a[2]?",
+                                            "attributes": {
+                                              "type": "comparison",
+                                              "i": 2,
+                                              "j": 2,
+                                              "branch": "No"
+                                            },
+                                            "children": [
+                                              {
+                                                "name": "a[2] < a[3]?",
+                                                "attributes": {
+                                                  "type": "comparison",
+                                                  "i": 2,
+                                                  "j": 3,
+                                                  "branch": "No"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "name": "a[3] < a[3]?",
+                                                    "attributes": {
+                                                      "type": "comparison",
+                                                      "i": 3,
+                                                      "j": 3,
+                                                      "branch": "No"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "name": "a[3] < a[2]?",
+                                                        "attributes": {
+                                                          "type": "comparison",
+                                                          "i": 3,
+                                                          "j": 2,
+                                                          "branch": "No"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "name": "Leaf (1)",
+                                                            "attributes": {
+                                                              "type": "leaf",
+                                                              "count": 1,
+                                                              "branch": "No",
+                                                              "input": "[3, 4, 1, 2]",
+                                                              "output": "[1, 2, 3, 4]"
+                                                            },
+                                                            "permutations": [
+                                                              {
+                                                                "input": [
+                                                                  3,
+                                                                  4,
+                                                                  1,
+                                                                  2
+                                                                ],
+                                                                "output": [
+                                                                  1,
+                                                                  2,
+                                                                  3,
+                                                                  4
+                                                                ],
+                                                                "swaps": [
+                                                                  [
+                                                                    0,
+                                                                    3
+                                                                  ],
+                                                                  [
+                                                                    1,
+                                                                    2
+                                                                  ],
+                                                                  [
+                                                                    0,
+                                                                    1
+                                                                  ],
+                                                                  [
+                                                                    2,
+                                                                    3
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
