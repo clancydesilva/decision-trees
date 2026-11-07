@@ -2,6 +2,18 @@ import React, { useRef, useEffect, useMemo, useCallback } from "react";
 import * as d3 from "d3";
 import { computeTidyTreeLayout } from "../utils/tidyLayout.js";
 
+// Generate smooth vertical cubic Bezier paths connecting parent bottom to child top
+function generateLinkPath(link, nodeHeight = 70) {
+  const sourceX = link.source.x;
+  const sourceY = link.source.y + nodeHeight / 2;
+  const targetX = link.target.x;
+  const targetY = link.target.y - nodeHeight / 2;
+
+  // Calculate vertical midpoint for smooth S-curve control points
+  const midY = (sourceY + targetY) / 2;
+  return `M ${sourceX} ${sourceY} C ${sourceX} ${midY}, ${targetX} ${midY}, ${targetX} ${targetY}`;
+}
+
 export function TreeViewer({ treeData }) {
   const containerRef = useRef(null);
   const svgRef = useRef(null);
@@ -88,7 +100,43 @@ export function TreeViewer({ treeData }) {
         </defs>
         <rect width="100%" height="100%" fill="url(#grid-pattern)" />
         <g ref={viewportRef} className="tree-viewport">
-          {/* Links and node cards will be populated in subsequent chunks */}
+          {/* Reingold-Tilford links and directional branch badges */}
+          <g className="links-layer">
+            {links.map((link, index) => {
+              const pathD = generateLinkPath(link, 70);
+              const branch = link.target.data.attributes?.branch;
+              const isYes = branch === "Yes";
+              const isNo = branch === "No";
+
+              // Midpoint coordinate along the vertical Bezier curve
+              const badgeX = (link.source.x + link.target.x) / 2;
+              const badgeY = (link.source.y + 35 + link.target.y - 35) / 2;
+
+              return (
+                <g key={`link-${index}`} className="tree-link-group">
+                  <path
+                    d={pathD}
+                    className={`tree-link ${isYes ? "link-yes" : isNo ? "link-no" : ""}`}
+                    fill="none"
+                  />
+                  {branch && (
+                    <g
+                      className={`branch-badge-group ${isYes ? "badge-yes" : "badge-no"}`}
+                      transform={`translate(${badgeX}, ${badgeY})`}
+                    >
+                      <circle r="11" className="branch-badge-circle" />
+                      <text dy="0.32em" textAnchor="middle" className="branch-badge-text">
+                        {isYes ? "Y" : isNo ? "N" : branch}
+                      </text>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+          </g>
+
+          {/* Node cards layer placeholder for Chunk 4 */}
+          <g className="nodes-layer" />
         </g>
       </svg>
     </div>
