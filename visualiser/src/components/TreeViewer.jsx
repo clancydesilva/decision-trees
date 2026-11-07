@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import * as d3 from "d3";
 import { computeTidyTreeLayout } from "../utils/tidyLayout.js";
 
@@ -19,6 +19,7 @@ export function TreeViewer({ treeData }) {
   const svgRef = useRef(null);
   const viewportRef = useRef(null);
   const zoomBehaviorRef = useRef(null);
+  const [hoveredNode, setHoveredNode] = useState(null);
 
   // Compute Reingold-Tilford layout using the adapter
   const { nodes, links, bounds } = useMemo(() => {
@@ -135,10 +136,90 @@ export function TreeViewer({ treeData }) {
             })}
           </g>
 
-          {/* Node cards layer placeholder for Chunk 4 */}
-          <g className="nodes-layer" />
+          {/* Decision tree comparison and leaf node cards */}
+          <g className="nodes-layer">
+            {nodes.map((node, index) => {
+              const isLeaf = !node.children || node.data.attributes?.type === "leaf";
+              const { name, attributes } = node.data;
+              const cardW = 150;
+              const cardH = 70;
+              const left = node.x - cardW / 2;
+              const top = node.y - cardH / 2;
+
+              return (
+                <g
+                  key={`node-${index}`}
+                  className={`tree-node-group ${isLeaf ? "node-leaf" : "node-comparison"}`}
+                  transform={`translate(${left}, ${top})`}
+                  onMouseEnter={(e) => {
+                    const rect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+                    setHoveredNode({
+                      data: node.data,
+                      screenX: e.clientX - rect.left + 15,
+                      screenY: e.clientY - rect.top + 15,
+                    });
+                  }}
+                  onMouseLeave={() => setHoveredNode(null)}
+                >
+                  <rect width={cardW} height={cardH} rx="8" className="node-card-bg" />
+                  {isLeaf ? (
+                    <>
+                      <rect width={cardW} height="20" rx="8" className="node-card-header leaf-header" />
+                      <text x={cardW / 2} y="14" textAnchor="middle" className="node-header-text">
+                        LEAF ({attributes?.count || 1})
+                      </text>
+                      <text x={cardW / 2} y="40" textAnchor="middle" className="node-sub-text">
+                        Out: {attributes?.output || "Sorted"}
+                      </text>
+                      <text x={cardW / 2} y="56" textAnchor="middle" className="node-hint-text">
+                        In: {attributes?.input || ""}
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      <rect width={cardW} height="20" rx="8" className="node-card-header comparison-header" />
+                      <text x={cardW / 2} y="14" textAnchor="middle" className="node-header-text">
+                        COMPARISON
+                      </text>
+                      <text x={cardW / 2} y="48" textAnchor="middle" className="node-title-text">
+                        {name}
+                      </text>
+                    </>
+                  )}
+                </g>
+              );
+            })}
+          </g>
         </g>
       </svg>
+
+      {/* Floating tooltip displaying leaf swap details and input permutations */}
+      {hoveredNode && (
+        <div
+          className="tree-node-tooltip"
+          style={{ left: hoveredNode.screenX, top: hoveredNode.screenY }}
+        >
+          <h4>{hoveredNode.data.name}</h4>
+          {hoveredNode.data.attributes?.type === "leaf" ? (
+            <div className="tooltip-details">
+              <p><strong>Permutations arriving:</strong> {hoveredNode.data.attributes?.count}</p>
+              <p><strong>Result:</strong> {hoveredNode.data.attributes?.output}</p>
+              {hoveredNode.data.permutations && hoveredNode.data.permutations.length > 0 && (
+                <div className="tooltip-permutations">
+                  <span className="tooltip-subheading">Sample trace:</span>
+                  <div className="tooltip-trace">
+                    Input: {JSON.stringify(hoveredNode.data.permutations[0].input)}
+                    <br />
+                    Swaps: {JSON.stringify(hoveredNode.data.permutations[0].swaps)}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="tooltip-note">Internal comparison node</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
