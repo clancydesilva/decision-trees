@@ -20,16 +20,36 @@ export function TreeViewer({ treeData }) {
   const viewportRef = useRef(null);
   const zoomBehaviorRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
+  const [collapsedIds, setCollapsedIds] = useState(new Set());
 
-  // Compute Reingold-Tilford layout using the adapter
+  // Reset collapsed nodes when loading a new algorithm or size
+  useEffect(() => {
+    setCollapsedIds(new Set());
+  }, [treeData]);
+
+  // Compute Reingold-Tilford layout using the adapter with collapsed branches pruned
   const { nodes, links, bounds } = useMemo(() => {
     return computeTidyTreeLayout(treeData, {
       nodeWidth: 150,
       nodeHeight: 70,
       levelDistance: 100,
       siblingGap: 24,
+      collapsedIds,
     });
-  }, [treeData]);
+  }, [treeData, collapsedIds]);
+
+  // Toggle subtree folding for an internal comparison node
+  const handleToggleCollapse = (nodeId) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
 
   // Center and fit the entire tree within the visible SVG viewport
   const fitToScreen = useCallback(() => {
@@ -90,6 +110,16 @@ export function TreeViewer({ treeData }) {
         <button type="button" onClick={handleZoomIn} title="Zoom In">+</button>
         <button type="button" onClick={handleZoomOut} title="Zoom Out">−</button>
         <button type="button" onClick={fitToScreen} title="Fit to Screen">Fit</button>
+        {collapsedIds.size > 0 && (
+          <button
+            type="button"
+            className="toolbar-btn-expand"
+            onClick={() => setCollapsedIds(new Set())}
+            title="Expand All Subtrees"
+          >
+            Expand All
+          </button>
+        )}
       </div>
 
       {/* SVG Canvas hosting interactive tidy tree */}
@@ -139,8 +169,9 @@ export function TreeViewer({ treeData }) {
           {/* Decision tree comparison and leaf node cards */}
           <g className="nodes-layer">
             {nodes.map((node, index) => {
-              const isLeaf = !node.children || node.data.attributes?.type === "leaf";
-              const { name, attributes } = node.data;
+              const isLeaf = (!node.children && !node.data.isCollapsed) || node.data.attributes?.type === "leaf";
+              const isCollapsed = Boolean(node.data.isCollapsed);
+              const { name, attributes, nodeId, collapsedLeafCount } = node.data;
               const cardW = 150;
               const cardH = 70;
               const left = node.x - cardW / 2;
@@ -151,6 +182,8 @@ export function TreeViewer({ treeData }) {
                   key={`node-${index}`}
                   className={`tree-node-group ${isLeaf ? "node-leaf" : "node-comparison"}`}
                   transform={`translate(${left}, ${top})`}
+                  style={{ cursor: isLeaf ? "default" : "pointer" }}
+                  onClick={() => !isLeaf && nodeId && handleToggleCollapse(nodeId)}
                   onMouseEnter={(e) => {
                     const rect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
                     setHoveredNode({
@@ -179,11 +212,19 @@ export function TreeViewer({ treeData }) {
                     <>
                       <rect width={cardW} height="20" rx="8" className="node-card-header comparison-header" />
                       <text x={cardW / 2} y="14" textAnchor="middle" className="node-header-text">
-                        COMPARISON
+                        {isCollapsed ? "COMPARISON (FOLDED)" : "COMPARISON"}
                       </text>
                       <text x={cardW / 2} y="48" textAnchor="middle" className="node-title-text">
                         {name}
                       </text>
+                      {isCollapsed && (
+                        <g className="collapsed-indicator" transform={`translate(${cardW / 2}, ${cardH + 2})`}>
+                          <rect x="-44" y="-8" width="88" height="18" rx="9" className="collapsed-indicator-bg" />
+                          <text dy="0.32em" textAnchor="middle" className="collapsed-indicator-text">
+                            +{collapsedLeafCount} leaves
+                          </text>
+                        </g>
+                      )}
                     </>
                   )}
                 </g>
@@ -200,7 +241,11 @@ export function TreeViewer({ treeData }) {
           style={{ left: hoveredNode.screenX, top: hoveredNode.screenY }}
         >
           <h4>{hoveredNode.data.name}</h4>
-          {hoveredNode.data.attributes?.type === "leaf" ? (
+          {hoveredNode.data.isCollapsed ? (
+            <p className="tooltip-note">
+              Subtree folded (<strong>{hoveredNode.data.collapsedLeafCount}</strong> leaves hidden). Click node to expand.
+            </p>
+          ) : hoveredNode.data.attributes?.type === "leaf" ? (
             <div className="tooltip-details">
               <p><strong>Permutations arriving:</strong> {hoveredNode.data.attributes?.count}</p>
               <p><strong>Result:</strong> {hoveredNode.data.attributes?.output}</p>
@@ -216,7 +261,7 @@ export function TreeViewer({ treeData }) {
               )}
             </div>
           ) : (
-            <p className="tooltip-note">Internal comparison node</p>
+            <p className="tooltip-note">Click node to collapse / fold subtree</p>
           )}
         </div>
       )}

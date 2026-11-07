@@ -1,12 +1,20 @@
 import * as d3 from "d3";
 
+// Recursively count total leaf nodes under a subtree
+function countSubtreeLeaves(node) {
+  if (!node) return 0;
+  if (!node.children || node.children.length === 0) return 1;
+  return node.children.reduce((acc, child) => acc + countSubtreeLeaves(child), 0);
+}
+
 // Normalize node children into strict binary slots (left = Yes, right = No)
-// Satisfies Reingold-Tilford Aesthetic 2 by inserting virtual placeholders for single-branch nodes
-function normalizeBinarySlots(node) {
+// Satisfies Reingold-Tilford Aesthetic 2 and handles subtree folding when node is collapsed
+function normalizeBinarySlots(node, collapsedIds, path = "root") {
   if (!node) return null;
 
   const clone = {
     ...node,
+    nodeId: path,
     attributes: { ...node.attributes },
   };
 
@@ -16,6 +24,16 @@ function normalizeBinarySlots(node) {
     return clone;
   }
 
+  // If this internal node is marked collapsed, prune its children and track hidden leaf count
+  if (collapsedIds && collapsedIds.has(path)) {
+    clone.isCollapsed = true;
+    clone.collapsedLeafCount = countSubtreeLeaves(node);
+    clone.children = null;
+    return clone;
+  }
+
+  clone.isCollapsed = false;
+
   // Identify Yes and No branch children based on branch attribute
   let yesChild = null;
   let noChild = null;
@@ -23,15 +41,15 @@ function normalizeBinarySlots(node) {
   node.children.forEach((child) => {
     const branch = child.attributes?.branch;
     if (branch === "Yes") {
-      yesChild = normalizeBinarySlots(child);
+      yesChild = normalizeBinarySlots(child, collapsedIds, `${path}/Y`);
     } else if (branch === "No") {
-      noChild = normalizeBinarySlots(child);
+      noChild = normalizeBinarySlots(child, collapsedIds, `${path}/N`);
     } else {
       // Fallback: if branch attribute is absent, preserve original child order
       if (!yesChild) {
-        yesChild = normalizeBinarySlots(child);
+        yesChild = normalizeBinarySlots(child, collapsedIds, `${path}/L`);
       } else {
-        noChild = normalizeBinarySlots(child);
+        noChild = normalizeBinarySlots(child, collapsedIds, `${path}/R`);
       }
     }
   });
@@ -54,9 +72,10 @@ export function computeTidyTreeLayout(rawTreeData, options = {}) {
   const nodeHeight = options.nodeHeight || 80;
   const levelDistance = options.levelDistance || 110;
   const siblingGap = options.siblingGap || 20;
+  const collapsedIds = options.collapsedIds || new Set();
 
-  // 1. Structure the binary tree with virtual slots
-  const structuredRoot = normalizeBinarySlots(rawTreeData);
+  // 1. Structure the binary tree with virtual slots and folding
+  const structuredRoot = normalizeBinarySlots(rawTreeData, collapsedIds, "root");
 
   // 2. Instantiate D3 hierarchy
   const hierarchyRoot = d3.hierarchy(structuredRoot, (d) => d.children);
