@@ -56,7 +56,7 @@ export default function App() {
       <header className="app-header">
         <div className="header-title">
           <h1>Decision Tree Visualiser</h1>
-          <p>CS3509 Sorting Tree Workbench</p>
+          <p>Sorting Decision Tree Workbench</p>
         </div>
         {dataSource && (
           <div className="source-badge">
