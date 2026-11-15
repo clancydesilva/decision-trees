@@ -14,7 +14,49 @@ function generateLinkPath(link, nodeHeight = 70) {
   return `M ${sourceX} ${sourceY} C ${sourceX} ${midY}, ${targetX} ${midY}, ${targetX} ${targetY}`;
 }
 
-export function TreeViewer({ treeData }) {
+// Compute max depth of tree if not provided via props
+function getTreeMaxDepth(node, currentDepth = 0) {
+  if (!node || !node.children || node.children.length === 0) return currentDepth;
+  return Math.max(...node.children.map((child) => getTreeMaxDepth(child, currentDepth + 1)));
+}
+
+// Collect deterministic node IDs at targetDepth to initialize default folding
+function findCollapsedAtDepth(node, targetDepth = 3, currentDepth = 0, path = "root", collected = new Set()) {
+  if (!node || !node.children || node.children.length === 0) return collected;
+
+  // Reach target depth: mark this internal node to be collapsed
+  if (currentDepth === targetDepth) {
+    collected.add(path);
+    return collected;
+  }
+
+  // Follow child branches preserving binary path mapping
+  let yesChild = null;
+  let noChild = null;
+
+  node.children.forEach((child) => {
+    const branch = child.attributes?.branch;
+    if (branch === "Yes") {
+      yesChild = child;
+    } else if (branch === "No") {
+      noChild = child;
+    } else {
+      if (!yesChild) yesChild = child;
+      else noChild = child;
+    }
+  });
+
+  if (yesChild) {
+    findCollapsedAtDepth(yesChild, targetDepth, currentDepth + 1, `${path}/Y`, collected);
+  }
+  if (noChild) {
+    findCollapsedAtDepth(noChild, targetDepth, currentDepth + 1, `${path}/N`, collected);
+  }
+
+  return collected;
+}
+
+export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
   const containerRef = useRef(null);
   const svgRef = useRef(null);
   const viewportRef = useRef(null);
@@ -22,10 +64,23 @@ export function TreeViewer({ treeData }) {
   const [hoveredNode, setHoveredNode] = useState(null);
   const [collapsedIds, setCollapsedIds] = useState(new Set());
 
-  // Reset collapsed nodes when loading a new algorithm or size
+  // Determine whether initial folding is required (when tree max depth > 4)
   useEffect(() => {
-    setCollapsedIds(new Set());
-  }, [treeData]);
+    if (!treeData) {
+      setCollapsedIds(new Set());
+      return;
+    }
+
+    const calculatedMaxDepth = propMaxDepth ?? getTreeMaxDepth(treeData);
+
+    // If max depth > 4, default to collapsing comparison nodes at the 4th level (depth 3)
+    if (calculatedMaxDepth > 4) {
+      const defaultCollapsed = findCollapsedAtDepth(treeData, 3);
+      setCollapsedIds(defaultCollapsed);
+    } else {
+      setCollapsedIds(new Set());
+    }
+  }, [treeData, propMaxDepth]);
 
   // Compute Reingold-Tilford layout using the adapter with collapsed branches pruned
   const { nodes, links, bounds } = useMemo(() => {
