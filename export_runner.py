@@ -1,11 +1,9 @@
 import os
-import io
 import json
-import contextlib
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from main import DecisionTree
-from algorithms import ALL_ALGORITHMS
+from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
 ALGORITHM_MAP = {algo.__name__: algo for algo in ALL_ALGORITHMS}
 
@@ -31,7 +29,7 @@ def exportAllDatasets(output_dir="visualiser/public/data"):
     for algo_fn in ALL_ALGORITHMS:
         algo_catalog.append({
             "id": algo_fn.__name__,
-            "name": algo_fn.__name__.replace("Sort", " Sort").title(),
+            "name": ALGORITHM_INFO[algo_fn]["name"],
         })
         for n in (3, 4, 5):
             payload = generateTreePayload(algo_fn, n)
@@ -67,11 +65,11 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
         # Route 1: Catalog of available algorithms and supported sizes for the UI dropdown
         if parsed_url.path == "/api/algorithms":
             catalog = [
-                {"id": fn.__name__, "name": fn.__name__.replace("Sort", " Sort").title()}
+                {"id": fn.__name__, "name": ALGORITHM_INFO[fn]["name"]}
                 for fn in ALL_ALGORITHMS
             ]
             self._sendHeaders()
-            self.wfile.write(json.dumps({"algorithms": catalog, "supported_n": [3, 4]}).encode("utf-8"))
+            self.wfile.write(json.dumps({"algorithms": catalog, "supported_n": [3, 4, 5, 6, 7]}).encode("utf-8"))
             return
 
         # Route 2: On-demand algorithm execution and decision tree construction
@@ -87,7 +85,14 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "Parameter n must be an integer"}).encode("utf-8"))
                 return
 
-            # Validate parameter n: support up to n=7 for live full permutation trees
+            # Validate parameter n: require 1 <= n <= 7 for full permutation trees
+            if n < 1:
+                self._sendHeaders(status=400)
+                self.wfile.write(json.dumps({
+                    "error": f"Parameter n={n} must be at least 1."
+                }).encode("utf-8"))
+                return
+
             if n > 7:
                 self._sendHeaders(status=400)
                 self.wfile.write(json.dumps({

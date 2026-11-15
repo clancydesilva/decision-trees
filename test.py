@@ -1,4 +1,4 @@
-from tracked_list import TrackedList
+from math import factorial
 from algorithms import (
     bubbleSort,
     selectionSort,
@@ -18,6 +18,7 @@ from evaluate import (
     printComparisonTable,
     runScenarios,
 )
+from main import DecisionTree, buildAllTrees
 
 
 def testSingleEvaluate():
@@ -47,6 +48,8 @@ def testEvaluateAllDefault():
     for r in results:
         assert r["sorted_correctly"], f"{r['algorithm']} did not sort correctly"
         assert r["replay_matches"], f"{r['algorithm']} swap replay mismatch"
+        assert r["comparisons_in_bounds"], f"{r['algorithm']} comparisons out of bounds"
+        assert r["swaps_in_bounds"], f"{r['algorithm']} swaps out of bounds"
         assert r["elapsed_ms"] >= 0, f"{r['algorithm']} negative time"
 
     printComparisonTable(results)
@@ -66,6 +69,8 @@ def testEvaluateAllSubset():
     for r in results:
         assert r["sorted_correctly"]
         assert r["replay_matches"]
+        assert r["comparisons_in_bounds"], f"{r['algorithm']} comparisons out of bounds"
+        assert r["swaps_in_bounds"], f"{r['algorithm']} swaps out of bounds"
 
     printComparisonTable(results)
     print("  PASSED\n")
@@ -79,6 +84,8 @@ def testBestCase():
 
     for r in results:
         assert r["sorted_correctly"], f"{r['algorithm']} failed on sorted input"
+        assert r["comparisons_in_bounds"], f"{r['algorithm']} comparisons out of bounds"
+        assert r["swaps_in_bounds"], f"{r['algorithm']} swaps out of bounds"
         assert r["swaps"] == 0 or r["algorithm"] == "Heap Sort", \
             f"{r['algorithm']} did {r['swaps']} swaps on sorted input"
 
@@ -110,7 +117,7 @@ def testEdgeCases():
     for fn in ALL_ALGORITHMS:
         r1 = evaluate(fn, [42])
         assert r1["sorted_correctly"], f"{r1['algorithm']} failed on single element"
-        assert r1["comparisons"] == 0 or True  # some algorithms may still compare
+        assert r1["comparisons"] == 0, f"{r1['algorithm']} did comparisons on single element"
         assert r1["swaps"] == 0
 
     for fn in ALL_ALGORITHMS:
@@ -155,20 +162,23 @@ def testPrintEvaluationAll():
         printEvaluation(r)
         assert r["sorted_correctly"]
         assert r["replay_matches"]
+        assert r["comparisons_in_bounds"], f"{r['algorithm']} comparisons out of bounds"
+        assert r["swaps_in_bounds"], f"{r['algorithm']} swaps out of bounds"
     print("  PASSED\n")
 
 
-# Backward compatibility aliases
-test_single_evaluate = testSingleEvaluate
-test_evaluate_all_default = testEvaluateAllDefault
-test_evaluate_all_subset = testEvaluateAllSubset
-test_best_case = testBestCase
-test_worst_case = testWorstCase
-test_edge_cases = testEdgeCases
-test_timing = testTiming
-test_run_scenarios_all = testRunScenariosAll
-test_run_scenarios_subset = testRunScenariosSubset
-test_print_evaluation_all = testPrintEvaluationAll
+def testDecisionTrees():
+    # Verify decision tree construction and swap-replay verification for n=3 and n=4
+    print(">>> testDecisionTrees: verifying all leaves across all algorithms for n=3 and n=4")
+    for n in (3, 4):
+        trees = buildAllTrees(n)
+        assert len(trees) == len(ALL_ALGORITHMS)
+        for algo_fn, tree in trees.items():
+            assert tree.verifyAllLeaves(), f"{tree.algorithm_name} failed leaf verification at n={n}"
+            assert tree.leafCount() == factorial(n), (
+                f"{tree.algorithm_name} expected {factorial(n)} leaves for n={n}, got {tree.leafCount()}"
+            )
+    print("  PASSED\n")
 
 
 if __name__ == "__main__":
@@ -182,6 +192,7 @@ if __name__ == "__main__":
     testRunScenariosAll()
     testRunScenariosSubset()
     testPrintEvaluationAll()
+    testDecisionTrees()
     print("\n" + "=" * 60)
     print("  ALL TESTS PASSED")
     print("=" * 60)

@@ -1,5 +1,5 @@
 from typing import Optional
-from math import log2, ceil
+from math import log2
 from tracked_list import TrackedList
 
 
@@ -238,7 +238,7 @@ ALGORITHM_INFO = {
         "time_best": "O(n)",
         "time_avg": "O(n²)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: n - 1,                  # one pass, no swaps -> early exit
+        "comparisons_best": lambda n: max(0, n - 1),          # one pass, no swaps -> early exit
         "comparisons_worst": lambda n: n * (n - 1) // 2,      # every pair compared
         "swaps_best": lambda n: 0,                             # already sorted
         "swaps_worst": lambda n: n * (n - 1) // 2,            # reverse sorted -> swap every pair
@@ -251,14 +251,14 @@ ALGORITHM_INFO = {
         "comparisons_best": lambda n: n * (n - 1) // 2,       # always scans full unsorted suffix
         "comparisons_worst": lambda n: n * (n - 1) // 2,
         "swaps_best": lambda n: 0,                             # already sorted
-        "swaps_worst": lambda n: n - 1,                        # one swap per position
+        "swaps_worst": lambda n: max(0, n - 1),                # at most one swap per position
     },
     insertionSort: {
         "name": "Insertion Sort",
         "time_best": "O(n)",
         "time_avg": "O(n²)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: n - 1,                   # sorted -> one compare per element
+        "comparisons_best": lambda n: max(0, n - 1),          # sorted -> one compare per element
         "comparisons_worst": lambda n: n * (n - 1) // 2,      # reverse sorted
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
@@ -268,7 +268,7 @@ ALGORITHM_INFO = {
         "time_best": "O(n)",
         "time_avg": "O(n²)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: n - 1,
+        "comparisons_best": lambda n: max(0, n - 1),
         "comparisons_worst": lambda n: n * (n - 1) // 2,
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
@@ -278,8 +278,10 @@ ALGORITHM_INFO = {
         "time_best": "O(n log n)",
         "time_avg": "O(n^1.25)",                               # depends on gap sequence
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: max(0, n - 1),                     # sorted -> one compare per element per gap
-        "comparisons_worst": lambda n: n * (n - 1) // 2,
+        "comparisons_best": lambda n: sum(
+            n - (n >> k) for k in range(1, n.bit_length()) if (n >> k) > 0
+        ),                                                     # sorted -> (n - gap) compares per pass
+        "comparisons_worst": lambda n: n * (n - 1) // 2 + max(0, n - 2),
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
@@ -288,8 +290,8 @@ ALGORITHM_INFO = {
         "time_best": "O(n log n)",
         "time_avg": "O(n log n)",
         "time_worst": "O(n²)",
-        "comparisons_best": lambda n: max(0, n - 1),                      # best partition splits
-        "comparisons_worst": lambda n: n * (n - 1) // 2,       # already sorted -> worst pivot
+        "comparisons_best": lambda n: max(0, n - 1),          # best partition splits
+        "comparisons_worst": lambda n: n * (n - 1) // 2,      # already sorted -> worst pivot
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
     },
@@ -299,16 +301,16 @@ ALGORITHM_INFO = {
         "time_avg": "O(n log n)",
         "time_worst": "O(n²)",
         "comparisons_best": lambda n: max(0, n - 1),
-        "comparisons_worst": lambda n: n * (n - 1),            # two-pointer scanning
+        "comparisons_worst": lambda n: (n - 1) * (n + 6) // 2 if n >= 2 else 0,
         "swaps_best": lambda n: 0,
-        "swaps_worst": lambda n: n * (n - 1) // 4,             # fewer swaps than Lomuto
+        "swaps_worst": lambda n: n * (n - 1) // 2,
     },
     heapSort: {
         "name": "Heap Sort",
         "time_best": "O(n log n)",
         "time_avg": "O(n log n)",
         "time_worst": "O(n log n)",
-        "comparisons_best": lambda n: max(0, int(n * log2(max(n, 1)))),
+        "comparisons_best": lambda n: (n // 2) + max(0, n - 2),
         "comparisons_worst": lambda n: int(2 * n * log2(max(n, 1))),
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: int(n * log2(max(n, 1))),
@@ -318,7 +320,7 @@ ALGORITHM_INFO = {
         "time_best": "O(n log n)",
         "time_avg": "O(n log²n)",                              # in-place merge adds overhead
         "time_worst": "O(n²log n)",
-        "comparisons_best": lambda n: max(0, n - 1),               # sorted -> one compare per merge, early exit
+        "comparisons_best": lambda n: max(0, n - 1),          # sorted -> one compare per merge, early exit
         "comparisons_worst": lambda n: int(n * n * log2(max(n, 1))),
         "swaps_best": lambda n: 0,
         "swaps_worst": lambda n: n * (n - 1) // 2,
@@ -336,31 +338,3 @@ ALL_ALGORITHMS = [
     heapSort,
     mergeSort,
 ]
-
-# Backward compatibility aliases
-bubble_sort = bubbleSort
-selection_sort = selectionSort
-insertion_sort = insertionSort
-cocktail_shaker_sort = cocktailShakerSort
-shell_sort = shellSort
-quick_sort_lomuto = quickSortLomuto
-_lomuto_partition = _lomutoPartition
-quick_sort_hoare = quickSortHoare
-_hoare_partition = _hoarePartition
-heap_sort = heapSort
-merge_sort = mergeSort
-_in_place_merge = _inPlaceMerge
-
-# Register backward compatible aliases in ALGORITHM_INFO
-for _new_fn, _old_fn in [
-    (bubbleSort, bubble_sort),
-    (selectionSort, selection_sort),
-    (insertionSort, insertion_sort),
-    (cocktailShakerSort, cocktail_shaker_sort),
-    (shellSort, shell_sort),
-    (quickSortLomuto, quick_sort_lomuto),
-    (quickSortHoare, quick_sort_hoare),
-    (heapSort, heap_sort),
-    (mergeSort, merge_sort),
-]:
-    ALGORITHM_INFO[_old_fn] = ALGORITHM_INFO[_new_fn]

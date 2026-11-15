@@ -33,24 +33,33 @@ function findCollapsedAtDepth(node, targetDepth = 3, currentDepth = 0, path = "r
   // Follow child branches preserving binary path mapping
   let yesChild = null;
   let noChild = null;
+  let yesSuffix = "/Y";
+  let noSuffix = "/N";
 
   node.children.forEach((child) => {
     const branch = child.attributes?.branch;
     if (branch === "Yes") {
       yesChild = child;
+      yesSuffix = "/Y";
     } else if (branch === "No") {
       noChild = child;
+      noSuffix = "/N";
     } else {
-      if (!yesChild) yesChild = child;
-      else noChild = child;
+      if (!yesChild) {
+        yesChild = child;
+        yesSuffix = "/L";
+      } else {
+        noChild = child;
+        noSuffix = "/R";
+      }
     }
   });
 
   if (yesChild) {
-    findCollapsedAtDepth(yesChild, targetDepth, currentDepth + 1, `${path}/Y`, collected);
+    findCollapsedAtDepth(yesChild, targetDepth, currentDepth + 1, `${path}${yesSuffix}`, collected);
   }
   if (noChild) {
-    findCollapsedAtDepth(noChild, targetDepth, currentDepth + 1, `${path}/N`, collected);
+    findCollapsedAtDepth(noChild, targetDepth, currentDepth + 1, `${path}${noSuffix}`, collected);
   }
 
   return collected;
@@ -164,11 +173,22 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
 
         // Collapse immediate comparison children so expansion advances only one level
         if (nodeData?.rawChildren) {
+          let fallbackLeftAssigned = false;
           nodeData.rawChildren.forEach((child) => {
             if (child.children && child.children.length > 0) {
               const branch = child.attributes?.branch;
-              const childSuffix = branch === "Yes" ? "/Y" : branch === "No" ? "/N" : "/L";
+              let childSuffix = "/R";
+              if (branch === "Yes") {
+                childSuffix = "/Y";
+              } else if (branch === "No") {
+                childSuffix = "/N";
+              } else if (!fallbackLeftAssigned) {
+                childSuffix = "/L";
+                fallbackLeftAssigned = true;
+              }
               next.add(`${nodeId}${childSuffix}`);
+            } else if (!child.attributes?.branch && !fallbackLeftAssigned) {
+              fallbackLeftAssigned = true;
             }
           });
         }
@@ -298,11 +318,21 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
                   style={{ cursor: isLeaf ? "default" : "pointer" }}
                   onClick={() => !isLeaf && nodeId && handleToggleCollapse(nodeId, node.data)}
                   onMouseEnter={(e) => {
-                    const rect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+                    const rect = containerRef.current?.getBoundingClientRect() || {
+                      left: 0,
+                      top: 0,
+                      width: 800,
+                      height: 600,
+                    };
+                    const rawX = e.clientX - rect.left + 15;
+                    const rawY = e.clientY - rect.top + 15;
+                    // Clamp tooltip position within container bounds to prevent right/bottom clipping
+                    const clampedX = Math.max(12, Math.min(rawX, (rect.width || 800) - 305));
+                    const clampedY = Math.max(12, Math.min(rawY, (rect.height || 600) - 150));
                     setHoveredNode({
                       data: node.data,
-                      screenX: e.clientX - rect.left + 15,
-                      screenY: e.clientY - rect.top + 15,
+                      screenX: clampedX,
+                      screenY: clampedY,
                     });
                   }}
                   onMouseLeave={() => setHoveredNode(null)}

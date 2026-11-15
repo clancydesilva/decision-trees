@@ -145,14 +145,6 @@ def runScenarios(algorithms=None):
         printComparisonTable(results)
 
 
-# Backward compatibility aliases
-evaluate_all = evaluateAll
-print_evaluation = printEvaluation
-print_trace = printTrace
-print_comparison_table = printComparisonTable
-run_scenarios = runScenarios
-
-
 if __name__ == "__main__":
     from algorithms import insertionSort, bubbleSort
 

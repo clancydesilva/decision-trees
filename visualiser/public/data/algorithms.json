@@ -14,7 +14,7 @@
     },
     {
       "id": "cocktailShakerSort",
-      "name": "Cocktailshaker Sort"
+      "name": "Cocktail Shaker Sort"
     },
     {
       "id": "shellSort",
@@ -22,11 +22,11 @@
     },
     {
       "id": "quickSortLomuto",
-      "name": "Quick Sortlomuto"
+      "name": "Quick Sort (Lomuto)"
     },
     {
       "id": "quickSortHoare",
-      "name": "Quick Sorthoare"
+      "name": "Quick Sort (Hoare)"
     },
     {
       "id": "heapSort",
@@ -34,7 +34,7 @@
     },
     {
       "id": "mergeSort",
-      "name": "Merge Sort"
+      "name": "In-Place Merge Sort"
     }
   ],
   "supported_n": [

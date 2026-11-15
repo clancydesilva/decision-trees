@@ -1,4 +1,3 @@
-import json
 from itertools import permutations
 from math import factorial
 from tracked_list import TrackedList
@@ -60,6 +59,9 @@ class DecisionLeaf:
             attrs['branch'] = branch_label
         if len(inputs) == 1:
             attrs['input'] = str(inputs[0])
+            attrs['output'] = str(list(self.permutations[0]['output']))
+        elif len(inputs) > 1:
+            attrs['input'] = f"{inputs[0]} (+{len(inputs) - 1} more)"
             attrs['output'] = str(list(self.permutations[0]['output']))
         return {
             'name': f"Leaf ({len(inputs)})",
@@ -344,9 +346,6 @@ class DecisionTree:
             'tree': tree_data,
         }
 
-    def toJson(self, **kwargs):
-        return json.dumps(self.toDict(), **kwargs)
-
     def __repr__(self):
         return (f"DecisionTree({self.algorithm_name}, n={self.n}, "
                 f"leaves={self.leafCount()}, depth={self.depth()})")
@@ -357,10 +356,6 @@ def buildAllTrees(n, algorithms=None):
     if algorithms is None:
         algorithms = ALL_ALGORITHMS
     return {algo: DecisionTree(algo, n) for algo in algorithms}
-
-
-# Backward compatibility alias
-build_all_trees = buildAllTrees
 
 
 if __name__ == "__main__":
