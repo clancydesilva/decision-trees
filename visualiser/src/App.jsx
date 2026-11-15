@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AlgorithmForm } from "./components/AlgorithmForm.jsx";
 import { TreeViewer } from "./components/TreeViewer.jsx";
 
 // Fetch decision tree from live Python server, falling back to static precomputed JSON
-async function fetchAlgorithmTree(algoId, n) {
+async function fetchAlgorithmTree(algoId, n, signal) {
   try {
     // 1. Attempt live fetch from local Python server
-    const liveResponse = await fetch(`http://127.0.0.1:5001/api/run?algo=${algoId}&n=${n}`);
+    const liveResponse = await fetch(`http://127.0.0.1:5001/api/run?algo=${algoId}&n=${n}`, { signal });
     if (liveResponse.ok) {
       const liveData = await liveResponse.json();
       return { data: liveData, source: "Live Python Server" };
@@ -17,6 +17,9 @@ async function fetchAlgorithmTree(algoId, n) {
       }
     }
   } catch (err) {
+    if (err.name === "AbortError") {
+      throw err;
+    }
     // If the server explicitly responded with an error, propagate it
     if (err.message && !err.message.includes("Failed to fetch") && !err.message.includes("NetworkError")) {
       throw err;
@@ -24,7 +27,7 @@ async function fetchAlgorithmTree(algoId, n) {
   }
 
   // 2. Fallback to static public JSON data
-  const staticResponse = await fetch(`/data/${algoId}_n${n}.json`);
+  const staticResponse = await fetch(`/data/${algoId}_n${n}.json`, { signal });
   const contentType = staticResponse.headers.get("content-type") || "";
 
   // Verify response is genuine JSON and not Vite's HTML 404 fallback page
@@ -43,25 +46,41 @@ export default function App() {
   const [dataSource, setDataSource] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const abortControllerRef = useRef(null);
 
   // Trigger tree construction or retrieval for the chosen parameters
   const handleRunAlgorithm = async (algoId, n) => {
+    // Cancel any in-flight request before starting a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     setError(null);
     try {
-      const { data, source } = await fetchAlgorithmTree(algoId, n);
+      const { data, source } = await fetchAlgorithmTree(algoId, n, controller.signal);
       setTreeResult(data);
       setDataSource(source);
     } catch (err) {
+      if (err.name === "AbortError") return;
       setError(err.message || "Failed to load decision tree data");
     } finally {
-      setIsLoading(false);
+      if (abortControllerRef.current === controller) {
+        setIsLoading(false);
+      }
     }
   };
 
   // Run bubbleSort (n=3) on initial mount so the dashboard displays baseline data
   useEffect(() => {
     handleRunAlgorithm("bubbleSort", 3);
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   const stats = treeResult?.stats || {};

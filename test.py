@@ -18,7 +18,7 @@ from evaluate import (
     printComparisonTable,
     runScenarios,
 )
-from main import DecisionTree, buildAllTrees
+from decision_tree import DecisionTree, buildAllTrees, isValidMaxHeap
 
 
 def testSingleEvaluate():
@@ -178,6 +178,10 @@ def testDecisionTrees():
             assert tree.leafCount() == factorial(n), (
                 f"{tree.algorithm_name} expected {factorial(n)} leaves for n={n}, got {tree.leafCount()}"
             )
+
+    # Verify custom validator predicate support (e.g. max-heap verification)
+    assert isValidMaxHeap([1, 3, 2], [3, 1, 2]), "Expected [3, 1, 2] to be a valid max-heap"
+    assert not isValidMaxHeap([1, 3, 2], [1, 3, 2]), "Expected [1, 3, 2] to fail max-heap check"
     print("  PASSED\n")
 
 

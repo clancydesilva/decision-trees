@@ -1,8 +1,8 @@
 import os
 import json
 import urllib.parse
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from main import DecisionTree
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from decision_tree import DecisionTree
 from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
 ALGORITHM_MAP = {algo.__name__: algo for algo in ALL_ALGORITHMS}
@@ -119,9 +119,9 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
 
 
 def startServer(port=5001):
-    # Start the local development API server
+    # Start the local threaded development API server
     server_address = ("127.0.0.1", port)
-    httpd = HTTPServer(server_address, DecisionTreeRequestHandler)
+    httpd = ThreadingHTTPServer(server_address, DecisionTreeRequestHandler)
     print(f"Starting DecisionTree API server on http://127.0.0.1:{port}")
     httpd.serve_forever()
 
