@@ -14,20 +14,35 @@
   --radius-lg: 14px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --font-main: "Bahnschrift", sans-serif;
 }
 
-* {
+*,
+*::before,
+*::after,
+button,
+input,
+select,
+textarea,
+option,
+svg,
+text,
+tspan,
+code,
+pre {
   box-sizing: border-box;
+  font-family: var(--font-main) !important;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   overflow: hidden;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-main);
   background-color: var(--bg-primary);
   color: var(--text-main);
   line-height: 1.5;
@@ -223,7 +238,7 @@ body {
 .stat-value {
   color: var(--text-main);
   font-weight: 700;
-  font-family: monospace;
+  font-family: var(--font-main);
 }
 
 .stat-value.status-pass {
@@ -357,7 +372,7 @@ body {
   fill: #ffffff;
   font-size: 11px;
   font-weight: 700;
-  font-family: -apple-system, sans-serif;
+  font-family: var(--font-main);
 }
 
 /* Node card styling */
@@ -400,21 +415,21 @@ body {
 .node-title-text {
   fill: #f8fafc;
   font-size: 12.5px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-main);
   font-weight: 600;
 }
 
 .node-sub-text {
   fill: #34d399;
   font-size: 11px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-main);
   font-weight: 600;
 }
 
 .node-hint-text {
   fill: #94a3b8;
   font-size: 10px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-main);
 }
 
 /* Collapsed subtree indicator badge */
@@ -471,7 +486,7 @@ body {
 }
 
 .tooltip-trace {
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--font-main);
   font-size: 0.75rem;
   color: #38bdf8;
   margin-top: 4px;
