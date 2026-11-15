@@ -61,6 +61,7 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
   const svgRef = useRef(null);
   const viewportRef = useRef(null);
   const zoomBehaviorRef = useRef(null);
+  const boundsRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [collapsedIds, setCollapsedIds] = useState(new Set());
 
@@ -84,54 +85,53 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
 
   // Compute Reingold-Tilford layout using the adapter with collapsed branches pruned
   const { nodes, links, bounds } = useMemo(() => {
-    return computeTidyTreeLayout(treeData, {
+    const layout = computeTidyTreeLayout(treeData, {
       nodeWidth: 150,
       nodeHeight: 70,
       levelDistance: 100,
       siblingGap: 24,
       collapsedIds,
     });
+    boundsRef.current = layout.bounds;
+    return layout;
   }, [treeData, collapsedIds]);
 
-  // Toggle subtree folding for an internal comparison node
-  const handleToggleCollapse = (nodeId) => {
-    setCollapsedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(nodeId)) {
-        next.delete(nodeId);
-      } else {
-        next.add(nodeId);
-      }
-      return next;
-    });
-  };
-
-  // Center and fit the entire tree within the visible SVG viewport
+  // Center and fit the tree within the visible SVG viewport with generous bottom margin
   const fitToScreen = useCallback(() => {
-    if (!svgRef.current || !containerRef.current || nodes.length === 0) return;
+    if (!svgRef.current || !containerRef.current || !zoomBehaviorRef.current) return;
+    const currentBounds = boundsRef.current;
+    if (!currentBounds || currentBounds.width === 0) return;
 
     const width = containerRef.current.clientWidth || 800;
     const height = containerRef.current.clientHeight || 600;
-    const padding = 60;
 
-    const treeW = Math.max(bounds.width, 100);
-    const treeH = Math.max(bounds.height, 100);
+    // Raised bottom margin by 18% of viewport height to ensure leaf nodes and badges are never cut off
+    const horizontalPadding = 80;
+    const topPadding = 45;
+    const bottomPadding = Math.max(110, height * 0.18);
 
-    // Compute scale constrained between 0.15 and 1.2
-    const scale = Math.min(1.2, Math.max(0.15, Math.min((width - padding) / treeW, (height - padding) / treeH)));
+    const availableWidth = Math.max(width - horizontalPadding, 100);
+    const availableHeight = Math.max(height - topPadding - bottomPadding, 100);
 
-    // Center root and tree mass horizontally and vertically
-    const centerX = width / 2 - ((bounds.minX + bounds.maxX) / 2) * scale;
-    const centerY = padding + 20 - bounds.minY * scale;
+    // Include space for card half-height (35px) and collapsed leaf indicator badge (25px)
+    const treeW = Math.max(currentBounds.width, 100);
+    const treeH = Math.max(currentBounds.height + 40, 100);
+
+    const scale = Math.min(1.2, Math.max(0.12, Math.min(availableWidth / treeW, availableHeight / treeH)));
+
+    // Center root and tree mass horizontally
+    const centerX = width / 2 - ((currentBounds.minX + currentBounds.maxX) / 2) * scale;
+    // Align tree from top with topPadding, guaranteeing bottom clearance
+    const centerY = topPadding - (currentBounds.minY - 35) * scale;
 
     const transform = d3.zoomIdentity.translate(centerX, centerY).scale(scale);
     d3.select(svgRef.current)
       .transition()
-      .duration(400)
+      .duration(350)
       .call(zoomBehaviorRef.current.transform, transform);
-  }, [nodes.length, bounds]);
+  }, []);
 
-  // Initialize D3 pan & zoom behavior
+  // Initialize D3 pan & zoom behavior once on mount
   useEffect(() => {
     if (!svgRef.current || !viewportRef.current) return;
 
@@ -143,9 +143,61 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
 
     zoomBehaviorRef.current = zoomBehavior;
     d3.select(svgRef.current).call(zoomBehavior);
+  }, []);
 
-    fitToScreen();
-  }, [fitToScreen]);
+  // Re-fit viewport only when a new algorithm or input size dataset is loaded
+  useEffect(() => {
+    if (!treeData) return;
+    const timer = setTimeout(() => {
+      fitToScreen();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [treeData, fitToScreen]);
+
+  // Toggle subtree folding: expanding a node reveals only the immediate next level
+  const handleToggleCollapse = (nodeId, nodeData) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        // Expanding node: remove this node from collapsed
+        next.delete(nodeId);
+
+        // Collapse immediate comparison children so expansion advances only one level
+        if (nodeData?.rawChildren) {
+          nodeData.rawChildren.forEach((child) => {
+            if (child.children && child.children.length > 0) {
+              const branch = child.attributes?.branch;
+              const childSuffix = branch === "Yes" ? "/Y" : branch === "No" ? "/N" : "/L";
+              next.add(`${nodeId}${childSuffix}`);
+            }
+          });
+        }
+      } else {
+        // Collapsing node: fold this node and prune any deeper tracked IDs under it
+        next.add(nodeId);
+        for (const id of next) {
+          if (id !== nodeId && id.startsWith(`${nodeId}/`)) {
+            next.delete(id);
+          }
+        }
+      }
+      return next;
+    });
+  };
+
+  // Collapse all branches back to the 4th level (depth 3)
+  const handleCollapseAll = () => {
+    if (!treeData) return;
+    const defaultCollapsed = findCollapsedAtDepth(treeData, 3);
+    setCollapsedIds(defaultCollapsed);
+    setTimeout(fitToScreen, 50);
+  };
+
+  // Expand all branches across the entire decision tree
+  const handleExpandAll = () => {
+    setCollapsedIds(new Set());
+    setTimeout(fitToScreen, 50);
+  };
 
   // Programmatic zoom control handlers
   const handleZoomIn = () => {
@@ -165,16 +217,22 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
         <button type="button" onClick={handleZoomIn} title="Zoom In">+</button>
         <button type="button" onClick={handleZoomOut} title="Zoom Out">−</button>
         <button type="button" onClick={fitToScreen} title="Fit to Screen">Fit</button>
-        {collapsedIds.size > 0 && (
-          <button
-            type="button"
-            className="toolbar-btn-expand"
-            onClick={() => setCollapsedIds(new Set())}
-            title="Expand All Subtrees"
-          >
-            Expand All
-          </button>
-        )}
+        <button
+          type="button"
+          className="toolbar-btn-collapse"
+          onClick={handleCollapseAll}
+          title="Collapse all branches back to depth 4"
+        >
+          Collapse All
+        </button>
+        <button
+          type="button"
+          className="toolbar-btn-expand"
+          onClick={handleExpandAll}
+          title="Expand all branches"
+        >
+          Expand All
+        </button>
       </div>
 
       {/* SVG Canvas hosting interactive tidy tree */}
@@ -238,7 +296,7 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
                   className={`tree-node-group ${isLeaf ? "node-leaf" : "node-comparison"}`}
                   transform={`translate(${left}, ${top})`}
                   style={{ cursor: isLeaf ? "default" : "pointer" }}
-                  onClick={() => !isLeaf && nodeId && handleToggleCollapse(nodeId)}
+                  onClick={() => !isLeaf && nodeId && handleToggleCollapse(nodeId, node.data)}
                   onMouseEnter={(e) => {
                     const rect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
                     setHoveredNode({

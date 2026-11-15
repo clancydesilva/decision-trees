@@ -15,6 +15,7 @@ function normalizeBinarySlots(node, collapsedIds, path = "root") {
   const clone = {
     ...node,
     nodeId: path,
+    rawChildren: node.children,
     attributes: { ...node.attributes },
   };
 
