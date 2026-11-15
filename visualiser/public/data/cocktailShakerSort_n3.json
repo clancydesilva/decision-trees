@@ -2,8 +2,6 @@
   "algorithm": "Cocktail Shaker Sort",
   "algorithm_id": "cocktailShakerSort",
   "n": 3,
-  "print_output": "a[1] < a[0]?\n|-- Y: a[2] < a[1]?\n|   |-- Y: a[1] < a[0]?\n|   |   |-- Y: LEAF [(3, 2, 1)]\n|   |   `-- N: LEAF [(3, 1, 2)]\n|   `-- N: a[1] < a[0]?\n|       `-- N: LEAF [(2, 1, 3)]\n`-- N: a[2] < a[1]?\n    |-- Y: a[1] < a[0]?\n    |   |-- Y: LEAF [(2, 3, 1)]\n    |   `-- N: LEAF [(1, 3, 2)]\n    `-- N: LEAF [(1, 2, 3)]\n",
-  "summary": "DecisionTree: Cocktail Shaker Sort, n=3\n  Permutations:     6\n  Leaves:           6\n  Internal nodes:   6\n  Total nodes:      12\n  Min depth:        2\n  Max depth:        3\n  Avg depth:        2.83\n  All leaves valid: True",
   "stats": {
     "permutations": 6,
     "leaves": 6,

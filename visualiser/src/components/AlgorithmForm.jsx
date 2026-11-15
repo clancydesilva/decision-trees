@@ -23,11 +23,15 @@ export function AlgorithmForm({ onRun, isLoading, algorithms = DEFAULT_ALGORITHM
     setSelectedAlgo(e.target.value);
   };
 
-  // Update input size n and display warning for large trees (n >= 5)
+  // Update input size n and display performance notes
   const handleNChange = (n) => {
     setSelectedN(n);
-    if (n >= 5) {
-      setWarningMessage("n=5 has 120 permutations. Large tree rendering ceiling.");
+    if (n === 5) {
+      setWarningMessage("n=5 (120 permutations): precomputed & live");
+    } else if (n === 6) {
+      setWarningMessage("n=6 (720 permutations): requires live Python server");
+    } else if (n >= 7) {
+      setWarningMessage("n=7 (5,040 permutations): ~5-10s live computation");
     } else {
       setWarningMessage("");
     }
@@ -63,7 +67,7 @@ export function AlgorithmForm({ onRun, isLoading, algorithms = DEFAULT_ALGORITHM
       <div className="form-group">
         <label>Input Size (n)</label>
         <div className="button-group">
-          {[3, 4, 5].map((n) => (
+          {[3, 4, 5, 6, 7].map((n) => (
             <button
               key={n}
               type="button"

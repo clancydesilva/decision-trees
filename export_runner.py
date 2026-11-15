@@ -11,26 +11,20 @@ ALGORITHM_MAP = {algo.__name__: algo for algo in ALL_ALGORITHMS}
 
 
 def generateTreePayload(algo_fn, n):
-    # Construct decision tree and capture console text and structured dictionary
+    # Construct decision tree and extract structured dictionary for the visualiser
     tree = DecisionTree(algo_fn, n)
-    buffer = io.StringIO()
-    with contextlib.redirect_stdout(buffer):
-        tree.printTree()
-
     tree_dict = tree.toDict()
     return {
         "algorithm": tree.algorithm_name,
         "algorithm_id": algo_fn.__name__,
         "n": n,
-        "print_output": buffer.getvalue(),
-        "summary": tree.summary(),
         "stats": tree_dict.get("stats", {}),
         "tree": tree_dict.get("tree", {}),
     }
 
 
 def exportAllDatasets(output_dir="visualiser/public/data"):
-    # Pre-generate JSON datasets for all standard algorithms at n=3 and n=4
+    # Pre-generate JSON datasets for all standard algorithms at n=3, n=4, and n=5
     os.makedirs(output_dir, exist_ok=True)
     algo_catalog = []
 
@@ -39,7 +33,7 @@ def exportAllDatasets(output_dir="visualiser/public/data"):
             "id": algo_fn.__name__,
             "name": algo_fn.__name__.replace("Sort", " Sort").title(),
         })
-        for n in (3, 4):
+        for n in (3, 4, 5):
             payload = generateTreePayload(algo_fn, n)
             file_path = os.path.join(output_dir, f"{algo_fn.__name__}_n{n}.json")
             with open(file_path, "w", encoding="utf-8") as f:
@@ -47,7 +41,7 @@ def exportAllDatasets(output_dir="visualiser/public/data"):
 
     catalog_path = os.path.join(output_dir, "algorithms.json")
     with open(catalog_path, "w", encoding="utf-8") as f:
-        json.dump({"algorithms": algo_catalog, "supported_n": [3, 4]}, f, indent=2)
+        json.dump({"algorithms": algo_catalog, "supported_n": [3, 4, 5]}, f, indent=2)
 
 
 class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
@@ -93,10 +87,12 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "Parameter n must be an integer"}).encode("utf-8"))
                 return
 
-            # n=5 is the hard ceiling for full tree generation
-            if n > 5:
+            # Validate parameter n: support up to n=7 for live full permutation trees
+            if n > 7:
                 self._sendHeaders(status=400)
-                self.wfile.write(json.dumps({"error": "n=5 is the maximum supported ceiling"}).encode("utf-8"))
+                self.wfile.write(json.dumps({
+                    "error": f"n={n} is too large for full permutation trees ({n}! permutations). Maximum supported size is n=7."
+                }).encode("utf-8"))
                 return
 
             # Look up the algorithm function reference from the mapping dictionary
