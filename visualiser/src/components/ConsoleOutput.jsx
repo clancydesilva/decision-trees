@@ -76,20 +76,6 @@ export function ConsoleOutput({ data, isLoading, error }) {
           <code>{print_output || "(No print output available)"}</code>
         </pre>
       </div>
-
-      {/* Placeholder container for future D3.js interactive SVG tree */}
-      <div className="d3-placeholder-section">
-        <div className="placeholder-content">
-          <h4>D3.js Tree Visualization (Mount Point)</h4>
-          <p>
-            Structured hierarchy is loaded in memory ready for D3 SVG rendering.
-          </p>
-          {/* Placeholder: D3.js SVG tree rendering will mount here using tree data */}
-          <div className="tree-data-preview">
-            Root node: <code>{tree?.name || "None"}</code> | Child branches: <code>{tree?.children?.length || 0}</code>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
