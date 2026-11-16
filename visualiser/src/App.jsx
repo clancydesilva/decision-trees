@@ -4,13 +4,19 @@ import { TreeViewer } from "./components/TreeViewer.jsx";
 
 // Fetch decision tree from live Python server, falling back to static precomputed JSON
 async function fetchAlgorithmTree(algoId, n, signal) {
+  const numericN = Number(n);
+  if (!Number.isInteger(numericN) || numericN < 1 || numericN > 6) {
+    throw new Error(`Input size n=${n} is rejected. Full decision trees are hard-capped at n=6.`);
+  }
+
   try {
-    // 1. Attempt live fetch from local Python server
-    const liveResponse = await fetch(`http://127.0.0.1:5001/api/run?algo=${algoId}&n=${n}`, { signal });
-    if (liveResponse.ok) {
+    // 1. Attempt live fetch via relative API path (proxied in dev or served directly in production)
+    const liveResponse = await fetch(`/api/run?algo=${algoId}&n=${n}`, { signal });
+    const liveContentType = liveResponse.headers.get("content-type") || "";
+    if (liveResponse.ok && liveContentType.includes("application/json")) {
       const liveData = await liveResponse.json();
       return { data: liveData, source: "Live Python Server" };
-    } else {
+    } else if (liveContentType.includes("application/json")) {
       const errJson = await liveResponse.json().catch(() => null);
       if (errJson?.error) {
         throw new Error(errJson.error);
@@ -20,7 +26,7 @@ async function fetchAlgorithmTree(algoId, n, signal) {
     if (err.name === "AbortError") {
       throw err;
     }
-    // If the server explicitly responded with an error, propagate it
+    // If the server explicitly responded with an application error, propagate it
     if (err.message && !err.message.includes("Failed to fetch") && !err.message.includes("NetworkError")) {
       throw err;
     }

@@ -1,6 +1,10 @@
 # Local-only files (agent notes, analysis docs, scratch work)
 local/
 
+# Environment variables
+.env
+.env.*
+
 # Python
 __pycache__/
 *.py[cod]

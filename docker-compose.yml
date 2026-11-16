@@ -1,0 +1,9 @@
+services:
+  decision-trees:
+    build: .
+    container_name: decision-trees
+    ports:
+      - "127.0.0.1:5001:5001"
+    mem_limit: 1g
+    cpus: "1.5"
+    restart: unless-stopped

@@ -3,6 +3,8 @@ from math import factorial
 from tracked_list import TrackedList
 from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
+MAX_FULL_TREE_N = 6
+
 
 def isSortedOutput(input_perm, output_seq):
     # Default leaf validator verifying that the output is a sorted permutation of the input
@@ -178,6 +180,10 @@ class DecisionNode:
 class DecisionTree:
     # Full decision tree built from executing an algorithm across all n! permutations
     def __init__(self, algorithm, n, validator_fn=None):
+        if n < 1 or n > MAX_FULL_TREE_N:
+            raise ValueError(
+                f"Input size n={n} is rejected. Full decision trees are hard-capped at n={MAX_FULL_TREE_N}."
+            )
         self.algorithm = algorithm
         self.algorithm_name = ALGORITHM_INFO.get(algorithm, {}).get(
             'name', algorithm.__name__

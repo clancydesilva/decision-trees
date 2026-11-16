@@ -1,11 +1,13 @@
 import os
 import json
+import mimetypes
 import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from decision_tree import DecisionTree
 from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
 ALGORITHM_MAP = {algo.__name__: algo for algo in ALL_ALGORITHMS}
+STATIC_DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "visualiser", "dist"))
 
 
 def generateTreePayload(algo_fn, n):
@@ -69,7 +71,7 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 for fn in ALL_ALGORITHMS
             ]
             self._sendHeaders()
-            self.wfile.write(json.dumps({"algorithms": catalog, "supported_n": [3, 4, 5, 6, 7]}).encode("utf-8"))
+            self.wfile.write(json.dumps({"algorithms": catalog, "supported_n": [3, 4, 5, 6]}).encode("utf-8"))
             return
 
         # Route 2: On-demand algorithm execution and decision tree construction
@@ -85,7 +87,7 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "Parameter n must be an integer"}).encode("utf-8"))
                 return
 
-            # Validate parameter n: require 1 <= n <= 7 for full permutation trees
+            # Validate parameter n: require 1 <= n <= 6 for full permutation trees
             if n < 1:
                 self._sendHeaders(status=400)
                 self.wfile.write(json.dumps({
@@ -93,10 +95,10 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 }).encode("utf-8"))
                 return
 
-            if n > 7:
+            if n > 6:
                 self._sendHeaders(status=400)
                 self.wfile.write(json.dumps({
-                    "error": f"n={n} is too large for full permutation trees ({n}! permutations). Maximum supported size is n=7."
+                    "error": f"n={n} is too large for full permutation trees ({n}! permutations). Maximum supported size is n=6."
                 }).encode("utf-8"))
                 return
 
@@ -113,23 +115,66 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(payload).encode("utf-8"))
             return
 
+        # Route 3: Serve built frontend static assets from visualiser/dist when present
+        if os.path.isdir(STATIC_DIST_DIR):
+            unquoted_path = urllib.parse.unquote(parsed_url.path)
+            # Reject explicit parent-directory traversal segments in raw or decoded URL path
+            path_segments = [seg for seg in unquoted_path.replace("\\", "/").split("/") if seg]
+            if ".." in path_segments:
+                self._sendHeaders(status=403)
+                self.wfile.write(json.dumps({"error": "Forbidden"}).encode("utf-8"))
+                return
+
+            rel_path = "/".join(path_segments) if path_segments else "index.html"
+            dist_root = os.path.realpath(STATIC_DIST_DIR)
+            candidate_path = os.path.realpath(os.path.join(dist_root, rel_path))
+
+            # Guard against directory traversal and prefix collisions outside STATIC_DIST_DIR
+            try:
+                is_within_dist = os.path.commonpath([dist_root, candidate_path]) == dist_root
+            except ValueError:
+                is_within_dist = False
+
+            if not is_within_dist:
+                self._sendHeaders(status=403)
+                self.wfile.write(json.dumps({"error": "Forbidden"}).encode("utf-8"))
+                return
+
+            if os.path.isfile(candidate_path):
+                mime_type, _ = mimetypes.guess_type(candidate_path)
+                self._sendHeaders(content_type=mime_type or "application/octet-stream", status=200)
+                with open(candidate_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+
+            # SPA fallback to index.html for non-API routes
+            index_path = os.path.join(dist_root, "index.html")
+            if not unquoted_path.startswith("/api/") and os.path.isfile(index_path):
+                self._sendHeaders(content_type="text/html; charset=utf-8", status=200)
+                with open(index_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+
         # Fallback for any unrecognized URL path
         self._sendHeaders(status=404)
         self.wfile.write(json.dumps({"error": "Route not found"}).encode("utf-8"))
 
 
-def startServer(port=5001):
-    # Start the local threaded development API server
-    server_address = ("127.0.0.1", port)
+def startServer(host=None, port=None):
+    # Start the threaded HTTP server binding to configurable host and port
+    bind_host = host or os.environ.get("HOST", "127.0.0.1")
+    bind_port = int(port or os.environ.get("PORT", "5001"))
+    server_address = (bind_host, bind_port)
     httpd = ThreadingHTTPServer(server_address, DecisionTreeRequestHandler)
-    print(f"Starting DecisionTree API server on http://127.0.0.1:{port}")
+    print(f"Starting DecisionTree server on http://{bind_host}:{bind_port}")
     httpd.serve_forever()
 
 
 if __name__ == "__main__":
     import sys
     if "--serve" in sys.argv:
-        startServer()
+        host_arg = "0.0.0.0" if "--production" in sys.argv else None
+        startServer(host=host_arg)
     else:
         exportAllDatasets()
         print("Precomputed datasets generated in visualiser/public/data/")

@@ -182,6 +182,13 @@ def testDecisionTrees():
     # Verify custom validator predicate support (e.g. max-heap verification)
     assert isValidMaxHeap([1, 3, 2], [3, 1, 2]), "Expected [3, 1, 2] to be a valid max-heap"
     assert not isValidMaxHeap([1, 3, 2], [1, 3, 2]), "Expected [1, 3, 2] to fail max-heap check"
+
+    # Verify hard cap rejection for n > 6
+    try:
+        DecisionTree(bubbleSort, 7)
+        assert False, "Expected DecisionTree to reject n=7"
+    except ValueError:
+        pass
     print("  PASSED\n")
 
 
