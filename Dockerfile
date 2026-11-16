@@ -6,7 +6,7 @@ RUN npm ci
 COPY visualiser/ ./
 RUN npm run build
 
-# Stage 2: Python runtime serving both the built frontend and live tree API as non-root
+# Stage 2: Python runtime precomputing n=1..7 static datasets and serving the app as non-root
 FROM python:3.12-slim
 WORKDIR /app
 
@@ -16,6 +16,8 @@ COPY --chown=appuser:appuser tracked_list.py algorithms.py decision_tree.py eval
 COPY --from=frontend-builder --chown=appuser:appuser /app/visualiser/dist ./visualiser/dist
 
 USER appuser
+RUN python export_runner.py --output visualiser/dist/data
+
 ENV HOST=0.0.0.0
 ENV PORT=5001
 EXPOSE 5001

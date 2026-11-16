@@ -3,11 +3,12 @@ import json
 import mimetypes
 import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from decision_tree import DecisionTree
+from decision_tree import DecisionTree, MAX_FULL_TREE_N
 from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
 ALGORITHM_MAP = {algo.__name__: algo for algo in ALL_ALGORITHMS}
 STATIC_DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "visualiser", "dist"))
+STATIC_PUBLIC_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "visualiser", "public", "data"))
 
 
 def generateTreePayload(algo_fn, n):
@@ -23,37 +24,48 @@ def generateTreePayload(algo_fn, n):
     }
 
 
+def writeJsonAtomic(file_path, payload):
+    # Write compact JSON to a temporary sibling file and atomically replace destination
+    tmp_path = f"{file_path}.tmp.{os.getpid()}"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, separators=(",", ":"))
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp_path, file_path)
+
+
 def exportAllDatasets(output_dir="visualiser/public/data"):
-    # Pre-generate JSON datasets for all standard algorithms at n=3, n=4, and n=5
+    # Pre-generate compact JSON datasets for all 9 algorithms across n=1..7 (63 datasets total)
     os.makedirs(output_dir, exist_ok=True)
     algo_catalog = []
+    supported_sizes = list(range(1, MAX_FULL_TREE_N + 1))
 
     for algo_fn in ALL_ALGORITHMS:
         algo_catalog.append({
             "id": algo_fn.__name__,
             "name": ALGORITHM_INFO[algo_fn]["name"],
         })
-        for n in (3, 4, 5):
+        for n in supported_sizes:
             payload = generateTreePayload(algo_fn, n)
             file_path = os.path.join(output_dir, f"{algo_fn.__name__}_n{n}.json")
-            with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(payload, f, indent=2)
+            writeJsonAtomic(file_path, payload)
 
     catalog_path = os.path.join(output_dir, "algorithms.json")
-    with open(catalog_path, "w", encoding="utf-8") as f:
-        json.dump({"algorithms": algo_catalog, "supported_n": [3, 4, 5]}, f, indent=2)
+    writeJsonAtomic(catalog_path, {"algorithms": algo_catalog, "supported_n": supported_sizes})
 
 
 class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
-    # Lightweight HTTP handler acting as a local REST API without external dependencies (Flask/FastAPI)
-    def _sendHeaders(self, content_type="application/json", status=200):
+    # Lightweight HTTP handler acting as a local REST API and static file server
+    def _sendHeaders(self, content_type="application/json", status=200, extra_headers=None):
         # Attach standard response headers and enable Cross-Origin Resource Sharing (CORS)
-        # This allows the frontend (running on Vite at localhost:5173) to fetch data from localhost:5001
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        if extra_headers:
+            for header_name, header_val in extra_headers.items():
+                self.send_header(header_name, header_val)
         self.end_headers()
 
     def do_OPTIONS(self):
@@ -71,7 +83,12 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 for fn in ALL_ALGORITHMS
             ]
             self._sendHeaders()
-            self.wfile.write(json.dumps({"algorithms": catalog, "supported_n": [3, 4, 5, 6]}).encode("utf-8"))
+            self.wfile.write(
+                json.dumps(
+                    {"algorithms": catalog, "supported_n": list(range(1, MAX_FULL_TREE_N + 1))},
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            )
             return
 
         # Route 2: On-demand algorithm execution and decision tree construction
@@ -87,7 +104,7 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "Parameter n must be an integer"}).encode("utf-8"))
                 return
 
-            # Validate parameter n: require 1 <= n <= 6 for full permutation trees
+            # Validate parameter n: require 1 <= n <= 7 for full permutation trees
             if n < 1:
                 self._sendHeaders(status=400)
                 self.wfile.write(json.dumps({
@@ -95,10 +112,10 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 }).encode("utf-8"))
                 return
 
-            if n > 6:
+            if n > MAX_FULL_TREE_N:
                 self._sendHeaders(status=400)
                 self.wfile.write(json.dumps({
-                    "error": f"n={n} is too large for full permutation trees ({n}! permutations). Maximum supported size is n=6."
+                    "error": f"n={n} is too large for full permutation trees ({n}! permutations). Maximum supported size is n={MAX_FULL_TREE_N}."
                 }).encode("utf-8"))
                 return
 
@@ -109,10 +126,10 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": f"Algorithm '{algo_id}' not found"}).encode("utf-8"))
                 return
 
-            # Run decision tree algorithm, capture printout and structured tree, then return JSON
+            # Run decision tree algorithm and return compact JSON
             payload = generateTreePayload(algo_fn, n)
             self._sendHeaders()
-            self.wfile.write(json.dumps(payload).encode("utf-8"))
+            self.wfile.write(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
             return
 
         # Route 3: Serve built frontend static assets from visualiser/dist when present
@@ -140,16 +157,30 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "Forbidden"}).encode("utf-8"))
                 return
 
+            # Fall back to visualiser/public/data if a /data/* file is requested before dist rebuild
+            if not os.path.isfile(candidate_path) and len(path_segments) == 2 and path_segments[0] == "data":
+                public_data_root = os.path.realpath(STATIC_PUBLIC_DATA_DIR)
+                alt_candidate = os.path.realpath(os.path.join(public_data_root, path_segments[1]))
+                if os.path.commonpath([public_data_root, alt_candidate]) == public_data_root and os.path.isfile(alt_candidate):
+                    candidate_path = alt_candidate
+
             if os.path.isfile(candidate_path):
                 mime_type, _ = mimetypes.guess_type(candidate_path)
-                self._sendHeaders(content_type=mime_type or "application/octet-stream", status=200)
+                extra_headers = None
+                if unquoted_path.startswith("/data/"):
+                    extra_headers = {"Cache-Control": "public, max-age=86400, immutable"}
+                self._sendHeaders(
+                    content_type=mime_type or "application/octet-stream",
+                    status=200,
+                    extra_headers=extra_headers,
+                )
                 with open(candidate_path, "rb") as f:
                     self.wfile.write(f.read())
                 return
 
-            # SPA fallback to index.html for non-API routes
+            # SPA fallback to index.html for non-API and non-data routes
             index_path = os.path.join(dist_root, "index.html")
-            if not unquoted_path.startswith("/api/") and os.path.isfile(index_path):
+            if not unquoted_path.startswith("/api/") and not unquoted_path.startswith("/data/") and os.path.isfile(index_path):
                 self._sendHeaders(content_type="text/html; charset=utf-8", status=200)
                 with open(index_path, "rb") as f:
                     self.wfile.write(f.read())
@@ -176,5 +207,10 @@ if __name__ == "__main__":
         host_arg = "0.0.0.0" if "--production" in sys.argv else None
         startServer(host=host_arg)
     else:
-        exportAllDatasets()
-        print("Precomputed datasets generated in visualiser/public/data/")
+        out_dir = "visualiser/public/data"
+        if "--output" in sys.argv:
+            idx = sys.argv.index("--output")
+            if idx + 1 < len(sys.argv):
+                out_dir = sys.argv[idx + 1]
+        exportAllDatasets(output_dir=out_dir)
+        print(f"Precomputed datasets generated in {out_dir}/")

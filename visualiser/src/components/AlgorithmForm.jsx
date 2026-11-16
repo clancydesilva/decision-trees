@@ -29,7 +29,9 @@ export function AlgorithmForm({ onRun, isLoading, algorithms = DEFAULT_ALGORITHM
     if (n === 5) {
       setWarningMessage("n=5 (120 permutations): precomputed & live");
     } else if (n === 6) {
-      setWarningMessage("n=6 (720 permutations): requires live Python server");
+      setWarningMessage("n=6 (720 permutations): precomputed & live");
+    } else if (n === 7) {
+      setWarningMessage("n=7 (5,040 permutations): precomputed & live");
     } else {
       setWarningMessage("");
     }
@@ -38,7 +40,7 @@ export function AlgorithmForm({ onRun, isLoading, algorithms = DEFAULT_ALGORITHM
   // Validate and submit parameter choices to parent runner
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isLoading || selectedN < 1 || selectedN > 6) return;
+    if (isLoading || selectedN < 1 || selectedN > 7) return;
     onRun(selectedAlgo, selectedN);
   };
 
@@ -65,7 +67,7 @@ export function AlgorithmForm({ onRun, isLoading, algorithms = DEFAULT_ALGORITHM
       <div className="form-group">
         <label>Input Size (n)</label>
         <div className="button-group">
-          {[3, 4, 5, 6].map((n) => (
+          {[3, 4, 5, 6, 7].map((n) => (
             <button
               key={n}
               type="button"

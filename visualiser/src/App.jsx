@@ -2,49 +2,43 @@ import React, { useState, useEffect, useRef } from "react";
 import { AlgorithmForm } from "./components/AlgorithmForm.jsx";
 import { TreeViewer } from "./components/TreeViewer.jsx";
 
-// Fetch decision tree from live Python server, falling back to static precomputed JSON
+// Fetch decision tree from precomputed static JSON first, falling back to live Python API
 async function fetchAlgorithmTree(algoId, n, signal) {
   const numericN = Number(n);
-  if (!Number.isInteger(numericN) || numericN < 1 || numericN > 6) {
-    throw new Error(`Input size n=${n} is rejected. Full decision trees are hard-capped at n=6.`);
+  if (!Number.isInteger(numericN) || numericN < 1 || numericN > 7) {
+    throw new Error(`Input size n=${n} is rejected. Full decision trees are hard-capped at n=7.`);
   }
 
+  // 1. Attempt fast static lookup from precomputed dataset (/data/{algo}_n{n}.json)
   try {
-    // 1. Attempt live fetch via relative API path (proxied in dev or served directly in production)
-    const liveResponse = await fetch(`/api/run?algo=${algoId}&n=${n}`, { signal });
-    const liveContentType = liveResponse.headers.get("content-type") || "";
-    if (liveResponse.ok && liveContentType.includes("application/json")) {
-      const liveData = await liveResponse.json();
-      return { data: liveData, source: "Live Python Server" };
-    } else if (liveContentType.includes("application/json")) {
-      const errJson = await liveResponse.json().catch(() => null);
-      if (errJson?.error) {
-        throw new Error(errJson.error);
-      }
+    const staticResponse = await fetch(`/data/${algoId}_n${numericN}.json`, { signal });
+    const staticContentType = staticResponse.headers.get("content-type") || "";
+    if (staticResponse.ok && staticContentType.includes("application/json")) {
+      const staticData = await staticResponse.json();
+      return { data: staticData, source: "Precomputed Dataset" };
     }
   } catch (err) {
     if (err.name === "AbortError") {
       throw err;
     }
-    // If the server explicitly responded with an application error, propagate it
-    if (err.message && !err.message.includes("Failed to fetch") && !err.message.includes("NetworkError")) {
-      throw err;
+  }
+
+  // 2. Fallback to live Python API server if static file is missing
+  const liveResponse = await fetch(`/api/run?algo=${algoId}&n=${numericN}`, { signal });
+  const liveContentType = liveResponse.headers.get("content-type") || "";
+  if (liveResponse.ok && liveContentType.includes("application/json")) {
+    const liveData = await liveResponse.json();
+    return { data: liveData, source: "Live Python Server" };
+  } else if (liveContentType.includes("application/json")) {
+    const errJson = await liveResponse.json().catch(() => null);
+    if (errJson?.error) {
+      throw new Error(errJson.error);
     }
   }
 
-  // 2. Fallback to static public JSON data
-  const staticResponse = await fetch(`/data/${algoId}_n${n}.json`, { signal });
-  const contentType = staticResponse.headers.get("content-type") || "";
-
-  // Verify response is genuine JSON and not Vite's HTML 404 fallback page
-  if (!staticResponse.ok || !contentType.includes("application/json")) {
-    throw new Error(
-      `Dataset for ${algoId} (n=${n}) is not precomputed. Start the live Python API server to generate dynamic trees on-demand: python export_runner.py --serve`
-    );
-  }
-
-  const staticData = await staticResponse.json();
-  return { data: staticData, source: "Precomputed Dataset" };
+  throw new Error(
+    `Dataset for ${algoId} (n=${numericN}) was not found statically and the live Python API server is unreachable.`
+  );
 }
 
 export default function App() {

@@ -3,7 +3,7 @@ from math import factorial
 from tracked_list import TrackedList
 from algorithms import ALL_ALGORITHMS, ALGORITHM_INFO
 
-MAX_FULL_TREE_N = 6
+MAX_FULL_TREE_N = 7
 
 
 def isSortedOutput(input_perm, output_seq):

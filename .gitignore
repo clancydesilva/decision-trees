@@ -1,6 +1,9 @@
 # Local-only files (agent notes, analysis docs, scratch work)
 local/
 
+# Precomputed decision tree JSON datasets (generated during build)
+visualiser/public/data/*.json
+
 # Environment variables
 .env
 .env.*
