@@ -65,7 +65,7 @@ function findCollapsedAtDepth(node, targetDepth = 3, currentDepth = 0, path = "r
   return collected;
 }
 
-export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
+export function TreeViewer({ treeData, maxDepth: propMaxDepth, n, totalNodes }) {
   const containerRef = useRef(null);
   const svgRef = useRef(null);
   const viewportRef = useRef(null);
@@ -73,6 +73,7 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
   const boundsRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [collapsedIds, setCollapsedIds] = useState(new Set());
+  const isExpandAllDisabled = (n && n >= 7) || (totalNodes && totalNodes > 3000);
 
   // Determine whether initial folding is required (when tree max depth > 4)
   useEffect(() => {
@@ -213,8 +214,9 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
     setTimeout(fitToScreen, 50);
   };
 
-  // Expand all branches across the entire decision tree
+  // Expand all branches across the entire decision tree (disabled when n >= 7 or > 3,000 nodes)
   const handleExpandAll = () => {
+    if (isExpandAllDisabled) return;
     setCollapsedIds(new Set());
     setTimeout(fitToScreen, 50);
   };
@@ -249,9 +251,14 @@ export function TreeViewer({ treeData, maxDepth: propMaxDepth }) {
           type="button"
           className="toolbar-btn-expand"
           onClick={handleExpandAll}
-          title="Expand all branches"
+          disabled={isExpandAllDisabled}
+          title={
+            isExpandAllDisabled
+              ? "Disabled for large trees (n >= 7 or > 3,000 nodes) to prevent browser lag. Click individual nodes to expand level by level."
+              : "Expand all branches"
+          }
         >
-          Expand All
+          {isExpandAllDisabled ? "Expand All (Capped at n=6)" : "Expand All"}
         </button>
       </div>
 

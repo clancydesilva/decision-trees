@@ -325,8 +325,13 @@ body {
   border-color: #f59e0b;
 }
 
-.tree-toolbar .toolbar-btn-expand:hover {
+.tree-toolbar .toolbar-btn-expand:hover:not(:disabled) {
   background: #d97706;
+}
+
+.tree-toolbar button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* SVG Canvas & Links */

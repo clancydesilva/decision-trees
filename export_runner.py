@@ -168,7 +168,7 @@ class DecisionTreeRequestHandler(BaseHTTPRequestHandler):
                 mime_type, _ = mimetypes.guess_type(candidate_path)
                 extra_headers = None
                 if unquoted_path.startswith("/data/"):
-                    extra_headers = {"Cache-Control": "public, max-age=86400, immutable"}
+                    extra_headers = {"Cache-Control": "public, max-age=3600"}
                 self._sendHeaders(
                     content_type=mime_type or "application/octet-stream",
                     status=200,

@@ -150,7 +150,12 @@ export default function App() {
             <p>{error}</p>
           </div>
         ) : (
-          <TreeViewer treeData={treeResult?.tree} maxDepth={stats.max_depth} />
+          <TreeViewer
+            treeData={treeResult?.tree}
+            maxDepth={stats.max_depth}
+            n={treeResult?.n}
+            totalNodes={stats.total_nodes}
+          />
         )}
       </main>
     </div>
